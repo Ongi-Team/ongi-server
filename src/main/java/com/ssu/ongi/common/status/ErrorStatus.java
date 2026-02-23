@@ -9,8 +9,6 @@ import org.springframework.http.HttpStatus;
 @Getter
 @AllArgsConstructor
 public enum ErrorStatus implements BaseStatus {
-    // 예시
-    COMMON_ERROR_STATUS(HttpStatus.BAD_REQUEST, "COMMON_400", "잘못된 요청입니다."),
 
     /**
      * Common
@@ -20,7 +18,15 @@ public enum ErrorStatus implements BaseStatus {
     FORBIDDEN(HttpStatus.FORBIDDEN, "COMMON_403", "접근 권한이 없습니다."),
     NOT_FOUND(HttpStatus.NOT_FOUND, "COMMON_404", "요청한 자원을 찾을 수 없습니다."),
     METHOD_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED, "COMMON_405", "허용되지 않은 메소드입니다."),
-    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "COMMON_500", "서버 내부 오류입니다.");
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "COMMON_500", "서버 내부 오류입니다."),
+
+    /**
+     * Auth
+     */
+    DUPLICATE_LOGIN_ID(HttpStatus.CONFLICT, "AUTH_409", "이미 사용 중인 아이디입니다."),
+    MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "AUTH_404", "회원을 찾을 수 없습니다."),
+    INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "AUTH_401", "비밀번호가 일치하지 않습니다."),
+    ELDER_NOT_FOUND(HttpStatus.NOT_FOUND, "AUTH_404_2", "어르신 정보를 찾을 수 없습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;
