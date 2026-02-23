@@ -8,7 +8,7 @@ spring:
   jpa:
     open-in-view: false
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
     properties:
       hibernate:
         format_sql: true
@@ -16,3 +16,7 @@ spring:
 logging:
   level:
     org.hibernate.SQL: debug
+
+jwt:
+  secret: ${JWT_SECRET:b25naS1zZXJ2ZXItand0LXNlY3JldC1rZXktZm9yLWRldmVsb3BtZW50LWVudmlyb25tZW50}
+  expiration: 86400000
