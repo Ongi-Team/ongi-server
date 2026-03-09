@@ -1,8 +1,10 @@
 package com.ssu.ongi.domain.auth.controller;
 
+import com.ssu.ongi.domain.member.dto.response.ReissueResponse;
 import com.ssu.ongi.common.response.ApiResponse;
 import com.ssu.ongi.domain.member.dto.request.FindIdRequest;
 import com.ssu.ongi.domain.member.dto.request.LoginRequest;
+import com.ssu.ongi.domain.member.dto.request.ReissueRequest;
 import com.ssu.ongi.domain.member.dto.request.SignupRequest;
 import com.ssu.ongi.domain.member.dto.request.UpdatePasswordRequest;
 import com.ssu.ongi.domain.member.dto.response.CheckIdResponse;
@@ -274,4 +276,46 @@ public interface AuthControllerDocs {
             )
     })
     ResponseEntity<ApiResponse<Void>> updatePassword(@Valid @RequestBody UpdatePasswordRequest request);
+
+    @Operation(summary = "토큰 재발급", description = "RefreshToken으로 AccessToken과 RefreshToken을 재발급합니다. (RTR 전략 - 재발급 시 기존 RefreshToken 폐기)")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "토큰 재발급 성공",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                                    {
+                                      "isSuccess": true,
+                                      "code": "COMMON_200",
+                                      "message": "요청에 성공하였습니다.",
+                                      "data": {
+                                        "accessToken": "eyJhbGciOiJIUzI1NiJ9...",
+                                        "refreshToken": "eyJhbGciOiJIUzI1NiJ9..."
+                                      }
+                                    }
+                                    """))
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "401",
+                    description = "만료된 토큰 또는 이미 사용된 토큰 (재사용 감지 시 강제 로그아웃)",
+                    content = @Content(mediaType = "application/json",
+                            examples = {
+                                    @ExampleObject(name = "만료된 토큰", value = """
+                                            {
+                                              "isSuccess": false,
+                                              "code": "JWT_401_1",
+                                              "message": "만료된 토큰입니다."
+                                            }
+                                            """),
+                                    @ExampleObject(name = "토큰 재사용 감지", value = """
+                                            {
+                                              "isSuccess": false,
+                                              "code": "JWT_401_4",
+                                              "message": "이미 사용된 토큰입니다. 다시 로그인해주세요."
+                                            }
+                                            """)
+                            })
+            )
+    })
+    ResponseEntity<ApiResponse<ReissueResponse>> reissue(@Valid @RequestBody ReissueRequest request);
 }

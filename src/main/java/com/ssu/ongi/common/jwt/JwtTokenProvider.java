@@ -15,8 +15,11 @@ import java.util.Date;
 @Component
 public class JwtTokenProvider {
 
-    @Value("${jwt.secret}")
-    private String secretKey;
+    @Value("${jwt.access-secret}")
+    private String accessSecret;
+
+    @Value("${jwt.refresh-secret}")
+    private String refreshSecret;
 
     @Value("${jwt.expiration}")
     private long expiration;
@@ -24,12 +27,13 @@ public class JwtTokenProvider {
     @Value("${jwt.refresh-expiration}")
     private long refreshExpiration;
 
-    private SecretKey key;
+    private SecretKey accessKey;
+    private SecretKey refreshKey;
 
     @PostConstruct
     protected void init() {
-        byte[] keyBytes = Base64.getDecoder().decode(secretKey);
-        this.key = Keys.hmacShaKeyFor(keyBytes);
+        this.accessKey = Keys.hmacShaKeyFor(Base64.getDecoder().decode(accessSecret));
+        this.refreshKey = Keys.hmacShaKeyFor(Base64.getDecoder().decode(refreshSecret));
     }
 
     public String createAccessToken(Long memberId, LoginMode loginMode) {
@@ -39,7 +43,7 @@ public class JwtTokenProvider {
                 .claim("loginMode", loginMode.name())
                 .issuedAt(now)
                 .expiration(new Date(now.getTime() + expiration))
-                .signWith(key)
+                .signWith(accessKey)
                 .compact();
     }
 
@@ -49,30 +53,31 @@ public class JwtTokenProvider {
                 .subject(String.valueOf(memberId))
                 .issuedAt(now)
                 .expiration(new Date(now.getTime() + refreshExpiration))
-                .signWith(key)
+                .signWith(refreshKey)
                 .compact();
     }
 
-    // 하위 호환을 위해 유지
-    public String createToken(Long memberId, LoginMode loginMode) {
-        return createAccessToken(memberId, loginMode);
+    // AccessToken에서 memberId 추출 (Filter에서 사용)
+    public Long getMemberId(String token) {
+        return Long.parseLong(getAccessClaims(token).getSubject());
     }
 
-    public Long getMemberId(String token) {
-        Claims claims = getClaims(token);
-        return Long.parseLong(claims.getSubject());
+    // RefreshToken에서 memberId 추출 (재발급 시 사용)
+    public Long getMemberIdFromRefresh(String token) {
+        return Long.parseLong(getRefreshClaims(token).getSubject());
     }
 
     public LoginMode getLoginMode(String token) {
-        Claims claims = getClaims(token);
-        return LoginMode.valueOf(claims.get("loginMode", String.class));
+        return LoginMode.valueOf(getAccessClaims(token).get("loginMode", String.class));
     }
 
-    private Claims getClaims(String token) {
-        return Jwts.parser()
-                .verifyWith(key)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+    private Claims getAccessClaims(String token) {
+        return Jwts.parser().verifyWith(accessKey).build()
+                .parseSignedClaims(token).getPayload();
+    }
+
+    private Claims getRefreshClaims(String token) {
+        return Jwts.parser().verifyWith(refreshKey).build()
+                .parseSignedClaims(token).getPayload();
     }
 }

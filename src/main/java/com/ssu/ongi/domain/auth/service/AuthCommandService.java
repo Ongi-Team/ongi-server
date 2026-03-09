@@ -2,9 +2,11 @@ package com.ssu.ongi.domain.auth.service;
 
 import com.ssu.ongi.common.jwt.TokenCommandService;
 import com.ssu.ongi.common.jwt.TokenPair;
+import com.ssu.ongi.domain.member.dto.response.ReissueResponse;
 import com.ssu.ongi.domain.elder.entity.Elder;
 import com.ssu.ongi.domain.elder.service.ElderCommandService;
 import com.ssu.ongi.domain.member.dto.request.LoginRequest;
+import com.ssu.ongi.domain.member.dto.request.ReissueRequest;
 import com.ssu.ongi.domain.member.dto.request.SignupRequest;
 import com.ssu.ongi.domain.member.dto.request.UpdatePasswordRequest;
 import com.ssu.ongi.domain.member.dto.response.LoginResponse;
@@ -37,12 +39,18 @@ public class AuthCommandService {
         Member member = memberQueryService.findByLoginId(request.loginId());
         memberQueryService.validatePassword(member, request.password());
 
-        TokenPair tokens = tokenCommandService.reissueTokens(member.getId(), request.loginMode());
+        TokenPair tokens = tokenCommandService.issueTokens(member.getId(), request.loginMode());
         return LoginResponse.of(tokens.accessToken(), tokens.refreshToken(), request.loginMode(), member);
     }
 
     public void updatePassword(UpdatePasswordRequest request) {
         Member member = memberQueryService.findByLoginIdAndPhone(request.loginId(), request.phone());
         memberCommandService.updatePassword(member, request.newPassword());
+    }
+
+    public ReissueResponse reissue(ReissueRequest request) {
+        Long memberId = tokenCommandService.getMemberIdFromRefreshToken(request.refreshToken());
+        TokenPair tokens = tokenCommandService.reissueTokens(memberId, request.refreshToken(), request.loginMode());
+        return ReissueResponse.from(tokens);
     }
 }

@@ -17,9 +17,10 @@ public class MemberQueryService {
     private final MemberQueryRepository memberQueryRepository;
     private final PasswordEncoder passwordEncoder;
 
+    // 로그인 전용 조회 - 아이디 없음도 INVALID_CREDENTIALS로 통일 (타이밍 어택 방지)
     public Member findByLoginId(String loginId) {
         return memberQueryRepository.findByLoginId(loginId)
-                .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.INVALID_CREDENTIALS));
     }
 
     public Member findByLoginIdAndPhone(String loginId, String phone) {
@@ -27,9 +28,10 @@ public class MemberQueryService {
                 .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
     }
 
+    // 비밀번호 불일치도 INVALID_CREDENTIALS로 통일 (타이밍 어택 방지)
     public void validatePassword(Member member, String rawPassword) {
         if (!passwordEncoder.matches(rawPassword, member.getPassword())) {
-            throw new GeneralException(ErrorStatus.INVALID_PASSWORD);
+            throw new GeneralException(ErrorStatus.INVALID_CREDENTIALS);
         }
     }
 }

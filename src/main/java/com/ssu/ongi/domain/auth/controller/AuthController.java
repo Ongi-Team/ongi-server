@@ -1,11 +1,13 @@
 package com.ssu.ongi.domain.auth.controller;
 
+import com.ssu.ongi.domain.member.dto.response.ReissueResponse;
 import com.ssu.ongi.common.response.ApiResponse;
 import com.ssu.ongi.common.status.SuccessStatus;
 import com.ssu.ongi.domain.auth.service.AuthCommandService;
 import com.ssu.ongi.domain.auth.service.AuthQueryService;
 import com.ssu.ongi.domain.member.dto.request.FindIdRequest;
 import com.ssu.ongi.domain.member.dto.request.LoginRequest;
+import com.ssu.ongi.domain.member.dto.request.ReissueRequest;
 import com.ssu.ongi.domain.member.dto.request.SignupRequest;
 import com.ssu.ongi.domain.member.dto.request.UpdatePasswordRequest;
 import com.ssu.ongi.domain.member.dto.response.CheckIdResponse;
@@ -73,5 +75,14 @@ public class AuthController implements AuthControllerDocs {
     ) {
         authCommandService.updatePassword(request);
         return ApiResponse.success(SuccessStatus.PASSWORD_UPDATE_SUCCESS);
+    }
+
+    @Override
+    @PostMapping("/reissue")
+    public ResponseEntity<ApiResponse<ReissueResponse>> reissue(
+            @Valid @RequestBody ReissueRequest request
+    ) {
+        ReissueResponse response = authCommandService.reissue(request);
+        return ApiResponse.success(SuccessStatus.OK, response);
     }
 }
