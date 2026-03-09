@@ -1,4 +1,4 @@
-package com.ssu.ongi.domain.member.service;
+package com.ssu.ongi.domain.auth.service;
 
 import com.ssu.ongi.common.exception.GeneralException;
 import com.ssu.ongi.common.jwt.JwtTokenProvider;
