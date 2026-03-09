@@ -17,6 +17,12 @@ public class MemberQueryService {
     private final MemberQueryRepository memberQueryRepository;
     private final PasswordEncoder passwordEncoder;
 
+    // 로그인 전용 - elders JOIN FETCH로 N+1 방지
+    public Member findByLoginIdWithElders(String loginId) {
+        return memberQueryRepository.findByLoginIdWithElders(loginId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.INVALID_CREDENTIALS));
+    }
+
     // 로그인 전용 조회 - 아이디 없음도 INVALID_CREDENTIALS로 통일 (타이밍 어택 방지)
     public Member findByLoginId(String loginId) {
         return memberQueryRepository.findByLoginId(loginId)

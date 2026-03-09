@@ -36,7 +36,7 @@ public class AuthCommandService {
     }
 
     public LoginResponse login(LoginRequest request) {
-        Member member = memberQueryService.findByLoginId(request.loginId());
+        Member member = memberQueryService.findByLoginIdWithElders(request.loginId());
         memberQueryService.validatePassword(member, request.password());
 
         TokenPair tokens = tokenCommandService.issueTokens(member.getId(), request.loginMode());
