@@ -11,5 +11,4 @@ class OngiApplicationTests {
     @Test
     void contextLoads() {
     }
-
 }
