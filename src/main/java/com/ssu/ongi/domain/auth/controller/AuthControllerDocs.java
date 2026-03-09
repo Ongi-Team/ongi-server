@@ -157,36 +157,27 @@ public interface AuthControllerDocs {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "401",
-                    description = "비밀번호 불일치",
+                    description = "아이디 또는 비밀번호 불일치",
                     content = @Content(mediaType = "application/json",
                             examples = @ExampleObject(value = """
                                     {
                                       "isSuccess": false,
                                       "code": "AUTH_401",
-                                      "message": "비밀번호가 일치하지 않습니다."
+                                      "message": "아이디 또는 비밀번호가 올바르지 않습니다."
                                     }
                                     """))
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "404",
-                    description = "회원 없음 또는 어르신 정보 없음",
+                    description = "어르신 정보 없음",
                     content = @Content(mediaType = "application/json",
-                            examples = {
-                                    @ExampleObject(name = "회원 없음", value = """
-                                            {
-                                              "isSuccess": false,
-                                              "code": "AUTH_404",
-                                              "message": "회원을 찾을 수 없습니다."
-                                            }
-                                            """),
-                                    @ExampleObject(name = "어르신 정보 없음", value = """
-                                            {
-                                              "isSuccess": false,
-                                              "code": "AUTH_404_2",
-                                              "message": "어르신 정보를 찾을 수 없습니다."
-                                            }
-                                            """)
-                            })
+                            examples = @ExampleObject(value = """
+                                    {
+                                      "isSuccess": false,
+                                      "code": "AUTH_404_2",
+                                      "message": "어르신 정보를 찾을 수 없습니다."
+                                    }
+                                    """))
             )
     })
     ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody LoginRequest request);
