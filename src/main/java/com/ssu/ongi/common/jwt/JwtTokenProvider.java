@@ -24,6 +24,9 @@ public class JwtTokenProvider {
     @Value("${jwt.expiration}")
     private long expiration;
 
+    @Value("${jwt.refresh-expiration}")
+    private long refreshExpiration;
+
     private SecretKey key;
 
     @PostConstruct
@@ -32,17 +35,30 @@ public class JwtTokenProvider {
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String createToken(Long memberId, LoginMode loginMode) {
+    public String createAccessToken(Long memberId, LoginMode loginMode) {
         Date now = new Date();
-        Date validity = new Date(now.getTime() + expiration);
-
         return Jwts.builder()
                 .subject(String.valueOf(memberId))
                 .claim("loginMode", loginMode.name())
                 .issuedAt(now)
-                .expiration(validity)
+                .expiration(new Date(now.getTime() + expiration))
                 .signWith(key)
                 .compact();
+    }
+
+    public String createRefreshToken(Long memberId) {
+        Date now = new Date();
+        return Jwts.builder()
+                .subject(String.valueOf(memberId))
+                .issuedAt(now)
+                .expiration(new Date(now.getTime() + refreshExpiration))
+                .signWith(key)
+                .compact();
+    }
+
+    // 하위 호환을 위해 유지
+    public String createToken(Long memberId, LoginMode loginMode) {
+        return createAccessToken(memberId, loginMode);
     }
 
     public Long getMemberId(String token) {

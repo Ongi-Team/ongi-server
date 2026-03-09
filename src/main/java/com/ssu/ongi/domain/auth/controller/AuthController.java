@@ -53,7 +53,7 @@ public class AuthController implements AuthControllerDocs {
     public ResponseEntity<ApiResponse<LoginResponse>> login(
             @Valid @RequestBody LoginRequest request
     ) {
-        LoginResponse response = authQueryService.login(request);
+        LoginResponse response = authCommandService.login(request);
         return ApiResponse.success(SuccessStatus.LOGIN_SUCCESS, response);
     }
 

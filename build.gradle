@@ -52,6 +52,9 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'com.h2database:h2'
 
+    // Redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
     // Springdoc OpenAPI (Swagger)
     implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0"
 }
