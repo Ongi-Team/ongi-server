@@ -2,10 +2,7 @@ package com.ssu.ongi.common.jwt;
 
 import com.ssu.ongi.domain.member.enums.LoginMode;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
@@ -69,17 +66,6 @@ public class JwtTokenProvider {
     public LoginMode getLoginMode(String token) {
         Claims claims = getClaims(token);
         return LoginMode.valueOf(claims.get("loginMode", String.class));
-    }
-
-    public boolean validateToken(String token) {
-        try {
-            getClaims(token);
-            return true;
-        } catch (ExpiredJwtException e) {
-            return false;
-        } catch (UnsupportedJwtException | MalformedJwtException | IllegalArgumentException e) {
-            return false;
-        }
     }
 
     private Claims getClaims(String token) {
