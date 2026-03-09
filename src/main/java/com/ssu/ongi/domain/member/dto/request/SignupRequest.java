@@ -1,7 +1,6 @@
 package com.ssu.ongi.domain.member.dto.request;
 
 import com.ssu.ongi.domain.elder.dto.request.ElderRequest;
-import com.ssu.ongi.domain.member.entity.Member;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -28,12 +27,4 @@ public record SignupRequest(
         @NotNull(message = "어르신 정보를 입력해주세요.")
         ElderRequest elder
 ) {
-    public Member toEntity(String encodedPassword) {
-        return Member.builder()
-                .loginId(loginId)
-                .password(encodedPassword)
-                .name(name)
-                .phone(phone)
-                .build();
-    }
 }

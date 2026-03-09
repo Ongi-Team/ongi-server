@@ -7,15 +7,13 @@ import com.ssu.ongi.domain.elder.dto.response.ElderResponse;
 import com.ssu.ongi.domain.elder.entity.Elder;
 import com.ssu.ongi.domain.member.dto.request.FindIdRequest;
 import com.ssu.ongi.domain.member.dto.request.LoginRequest;
-import com.ssu.ongi.domain.member.dto.request.ResetPasswordRequest;
-import com.ssu.ongi.domain.member.dto.request.SignupRequest;
 import com.ssu.ongi.domain.member.dto.response.CheckIdResponse;
 import com.ssu.ongi.domain.member.dto.response.FindIdResponse;
 import com.ssu.ongi.domain.member.dto.response.LoginResponse;
 import com.ssu.ongi.domain.member.dto.response.MemberResponse;
 import com.ssu.ongi.domain.member.entity.Member;
 import com.ssu.ongi.domain.member.enums.LoginMode;
-import com.ssu.ongi.domain.member.repository.MemberRepository;
+import com.ssu.ongi.domain.member.repository.MemberQueryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,36 +22,21 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class AuthService {
+public class AuthQueryService {
 
-    private final MemberRepository memberRepository;
+    private final MemberQueryRepository memberQueryRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
 
-    public void signup(SignupRequest request) {
-        if (memberRepository.existsByLoginId(request.loginId())) {
-            throw new GeneralException(ErrorStatus.DUPLICATE_LOGIN_ID);
-        }
-
-        String encodedPassword = passwordEncoder.encode(request.password());
-        Member member = request.toEntity(encodedPassword);
-        Elder elder = request.elder().toEntity();
-
-        member.addElder(elder);
-        memberRepository.save(member);
-    }
-
-    @Transactional(readOnly = true)
     public CheckIdResponse checkLoginId(String loginId) {
-        boolean exists = memberRepository.existsByLoginId(loginId);
+        boolean exists = memberQueryRepository.existsByLoginId(loginId);
         return CheckIdResponse.of(!exists);
     }
 
-    @Transactional(readOnly = true)
     public LoginResponse login(LoginRequest request) {
-        Member member = memberRepository.findByLoginId(request.loginId())
+        Member member = memberQueryRepository.findByLoginId(request.loginId())
                 .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 
         if (!passwordEncoder.matches(request.password(), member.getPassword())) {
@@ -76,18 +59,9 @@ public class AuthService {
         }
     }
 
-    @Transactional(readOnly = true)
     public FindIdResponse findId(FindIdRequest request) {
-        Member member = memberRepository.findByPhone(request.phone())
+        Member member = memberQueryRepository.findByPhone(request.phone())
                 .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
         return FindIdResponse.of(member.getLoginId());
-    }
-
-    public void resetPassword(ResetPasswordRequest request) {
-        Member member = memberRepository.findByLoginIdAndPhone(request.loginId(), request.phone())
-                .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
-
-        String encodedPassword = passwordEncoder.encode(request.newPassword());
-        member.updatePassword(encodedPassword);
     }
 }

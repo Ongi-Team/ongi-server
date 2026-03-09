@@ -36,14 +36,23 @@ public class Elder extends BaseEntity {
     private String relationship;
 
     @Builder
-    public Elder(String name, Integer age, String phone, String relationship) {
+    private Elder(String name, Integer age, String phone, String relationship) {
         this.name = name;
         this.age = age;
         this.phone = phone;
         this.relationship = relationship;
     }
 
-    public void setMember(Member member) {
+    public static Elder create(String name, Integer age, String phone, String relationship) {
+        return Elder.builder()
+                .name(name)
+                .age(age)
+                .phone(phone)
+                .relationship(relationship)
+                .build();
+    }
+
+    public void assignMember(Member member) {
         this.member = member;
     }
 }

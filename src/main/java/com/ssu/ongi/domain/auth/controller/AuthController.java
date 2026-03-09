@@ -2,18 +2,20 @@ package com.ssu.ongi.domain.auth.controller;
 
 import com.ssu.ongi.common.response.ApiResponse;
 import com.ssu.ongi.common.status.SuccessStatus;
+import com.ssu.ongi.domain.auth.service.AuthCommandService;
+import com.ssu.ongi.domain.auth.service.AuthQueryService;
 import com.ssu.ongi.domain.member.dto.request.FindIdRequest;
 import com.ssu.ongi.domain.member.dto.request.LoginRequest;
-import com.ssu.ongi.domain.member.dto.request.ResetPasswordRequest;
 import com.ssu.ongi.domain.member.dto.request.SignupRequest;
+import com.ssu.ongi.domain.member.dto.request.UpdatePasswordRequest;
 import com.ssu.ongi.domain.member.dto.response.CheckIdResponse;
 import com.ssu.ongi.domain.member.dto.response.FindIdResponse;
 import com.ssu.ongi.domain.member.dto.response.LoginResponse;
-import com.ssu.ongi.domain.auth.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,14 +27,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AuthController implements AuthControllerDocs {
 
-    private final AuthService authService;
+    private final AuthCommandService authCommandService;
+    private final AuthQueryService authQueryService;
 
     @Override
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse<Void>> signup(
             @Valid @RequestBody SignupRequest request
     ) {
-        authService.signup(request);
+        authCommandService.signup(request);
         return ApiResponse.success(SuccessStatus.SIGNUP_SUCCESS);
     }
 
@@ -41,7 +44,7 @@ public class AuthController implements AuthControllerDocs {
     public ResponseEntity<ApiResponse<CheckIdResponse>> checkLoginId(
             @RequestParam String loginId
     ) {
-        CheckIdResponse response = authService.checkLoginId(loginId);
+        CheckIdResponse response = authQueryService.checkLoginId(loginId);
         return ApiResponse.success(SuccessStatus.OK, response);
     }
 
@@ -50,7 +53,7 @@ public class AuthController implements AuthControllerDocs {
     public ResponseEntity<ApiResponse<LoginResponse>> login(
             @Valid @RequestBody LoginRequest request
     ) {
-        LoginResponse response = authService.login(request);
+        LoginResponse response = authQueryService.login(request);
         return ApiResponse.success(SuccessStatus.LOGIN_SUCCESS, response);
     }
 
@@ -59,16 +62,16 @@ public class AuthController implements AuthControllerDocs {
     public ResponseEntity<ApiResponse<FindIdResponse>> findId(
             @Valid @RequestBody FindIdRequest request
     ) {
-        FindIdResponse response = authService.findId(request);
+        FindIdResponse response = authQueryService.findId(request);
         return ApiResponse.success(SuccessStatus.OK, response);
     }
 
     @Override
-    @PostMapping("/reset-password")
-    public ResponseEntity<ApiResponse<Void>> resetPassword(
-            @Valid @RequestBody ResetPasswordRequest request
+    @PatchMapping("/password")
+    public ResponseEntity<ApiResponse<Void>> updatePassword(
+            @Valid @RequestBody UpdatePasswordRequest request
     ) {
-        authService.resetPassword(request);
-        return ApiResponse.success(SuccessStatus.PASSWORD_RESET_SUCCESS);
+        authCommandService.updatePassword(request);
+        return ApiResponse.success(SuccessStatus.PASSWORD_UPDATE_SUCCESS);
     }
 }

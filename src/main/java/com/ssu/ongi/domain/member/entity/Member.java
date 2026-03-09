@@ -38,11 +38,20 @@ public class Member extends BaseEntity {
     private List<Elder> elders = new ArrayList<>();
 
     @Builder
-    public Member(String loginId, String password, String name, String phone) {
+    private Member(String loginId, String password, String name, String phone) {
         this.loginId = loginId;
         this.password = password;
         this.name = name;
         this.phone = phone;
+    }
+
+    public static Member create(String loginId, String encodedPassword, String name, String phone) {
+        return Member.builder()
+                .loginId(loginId)
+                .password(encodedPassword)
+                .name(name)
+                .phone(phone)
+                .build();
     }
 
     public void updatePassword(String password) {
@@ -51,6 +60,6 @@ public class Member extends BaseEntity {
 
     public void addElder(Elder elder) {
         this.elders.add(elder);
-        elder.setMember(this);
+        elder.assignMember(this);
     }
 }
