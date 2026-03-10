@@ -2,6 +2,8 @@ package com.ssu.ongi.domain.auth.controller;
 
 import com.ssu.ongi.domain.member.dto.response.ReissueResponse;
 import com.ssu.ongi.common.response.ApiResponse;
+import com.ssu.ongi.domain.auth.dto.request.SendVerificationRequest;
+import com.ssu.ongi.domain.auth.dto.request.VerifyCodeRequest;
 import com.ssu.ongi.domain.member.dto.request.FindIdRequest;
 import com.ssu.ongi.domain.member.dto.request.LoginRequest;
 import com.ssu.ongi.domain.member.dto.request.ReissueRequest;
@@ -309,4 +311,74 @@ public interface AuthControllerDocs {
             )
     })
     ResponseEntity<ApiResponse<ReissueResponse>> reissue(@Valid @RequestBody ReissueRequest request);
+
+    @Operation(summary = "전화번호 인증 코드 발송", description = "입력한 전화번호로 6자리 인증번호를 SMS 발송합니다. 인증번호는 3분간 유효합니다.")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "인증번호 발송 성공",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                                    {
+                                      "isSuccess": true,
+                                      "code": "COMMON_200",
+                                      "message": "요청에 성공하였습니다."
+                                    }
+                                    """))
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "400",
+                    description = "전화번호 누락 또는 형식 오류",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                                    {
+                                      "isSuccess": false,
+                                      "code": "COMMON_400",
+                                      "message": "올바른 전화번호 형식이 아닙니다."
+                                    }
+                                    """))
+            )
+    })
+    ResponseEntity<ApiResponse<Void>> sendVerificationCode(@Valid @RequestBody SendVerificationRequest request);
+
+    @Operation(summary = "전화번호 인증 코드 확인", description = "발송된 6자리 인증번호를 검증합니다. 인증 성공 시 10분간 인증 완료 상태가 유지됩니다.")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "인증 성공",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                                    {
+                                      "isSuccess": true,
+                                      "code": "COMMON_200",
+                                      "message": "요청에 성공하였습니다."
+                                    }
+                                    """))
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "400",
+                    description = "인증번호 불일치",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                                    {
+                                      "isSuccess": false,
+                                      "code": "PHONE_400",
+                                      "message": "인증번호가 올바르지 않습니다."
+                                    }
+                                    """))
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "404",
+                    description = "인증번호 만료 또는 미발송 (3분 초과)",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                                    {
+                                      "isSuccess": false,
+                                      "code": "PHONE_404",
+                                      "message": "인증번호가 만료되었거나 존재하지 않습니다."
+                                    }
+                                    """))
+            )
+    })
+    ResponseEntity<ApiResponse<Void>> verifyCode(@Valid @RequestBody VerifyCodeRequest request);
 }

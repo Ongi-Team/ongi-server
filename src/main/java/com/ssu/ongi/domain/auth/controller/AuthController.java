@@ -3,7 +3,10 @@ package com.ssu.ongi.domain.auth.controller;
 import com.ssu.ongi.domain.member.dto.response.ReissueResponse;
 import com.ssu.ongi.common.response.ApiResponse;
 import com.ssu.ongi.common.status.SuccessStatus;
+import com.ssu.ongi.domain.auth.dto.request.SendVerificationRequest;
+import com.ssu.ongi.domain.auth.dto.request.VerifyCodeRequest;
 import com.ssu.ongi.domain.auth.service.AuthCommandService;
+import com.ssu.ongi.domain.auth.service.PhoneVerificationService;
 import com.ssu.ongi.domain.auth.service.AuthQueryService;
 import com.ssu.ongi.domain.member.dto.request.FindIdRequest;
 import com.ssu.ongi.domain.member.dto.request.LoginRequest;
@@ -31,6 +34,7 @@ public class AuthController implements AuthControllerDocs {
 
     private final AuthCommandService authCommandService;
     private final AuthQueryService authQueryService;
+    private final PhoneVerificationService phoneVerificationService;
 
     @Override
     @PostMapping("/signup")
@@ -84,5 +88,21 @@ public class AuthController implements AuthControllerDocs {
     ) {
         ReissueResponse response = authCommandService.reissue(request);
         return ApiResponse.success(SuccessStatus.OK, response);
+    }
+
+    @PostMapping("/phone/send")
+    public ResponseEntity<ApiResponse<Void>> sendVerificationCode(
+            @Valid @RequestBody SendVerificationRequest request
+    ) {
+        phoneVerificationService.sendVerificationCode(request);
+        return ApiResponse.success(SuccessStatus.OK);
+    }
+
+    @PostMapping("/phone/verify")
+    public ResponseEntity<ApiResponse<Void>> verifyCode(
+            @Valid @RequestBody VerifyCodeRequest request
+    ) {
+        phoneVerificationService.verifyCode(request);
+        return ApiResponse.success(SuccessStatus.OK);
     }
 }

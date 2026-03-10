@@ -31,6 +31,16 @@ public enum ErrorStatus implements BaseStatus {
     /**
      * JWT
      */
+    /**
+     * Phone Verification
+     */
+    VERIFICATION_CODE_NOT_FOUND(HttpStatus.NOT_FOUND, "PHONE_404", "인증번호가 만료되었거나 존재하지 않습니다."),
+    VERIFICATION_CODE_MISMATCH(HttpStatus.BAD_REQUEST, "PHONE_400", "인증번호가 일치하지 않습니다."),
+    PHONE_NOT_VERIFIED(HttpStatus.UNAUTHORIZED, "PHONE_401", "전화번호 인증이 필요합니다."),
+
+    /**
+     * JWT
+     */
     JWT_EXPIRED(HttpStatus.UNAUTHORIZED, "JWT_401_1", "만료된 토큰입니다."),
     JWT_INVALID(HttpStatus.UNAUTHORIZED, "JWT_401_2", "유효하지 않은 토큰입니다."),
     JWT_UNSUPPORTED(HttpStatus.UNAUTHORIZED, "JWT_401_3", "지원하지 않는 토큰 형식입니다."),

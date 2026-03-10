@@ -32,7 +32,9 @@ public class SecurityConfig {
             "/api/auth/check-id",
             "/api/auth/find-id",
             "/api/auth/password",
-            "/api/auth/reissue"
+            "/api/auth/reissue",
+            "/api/auth/phone/send",
+            "/api/auth/phone/verify"
     };
 
     @Bean
