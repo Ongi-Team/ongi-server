@@ -23,13 +23,17 @@ public enum SuccessStatus implements BaseStatus {
     PASSWORD_UPDATE_SUCCESS(HttpStatus.OK, "AUTH_200_2", "비밀번호가 변경되었습니다."),
 
     /**
-     * Medicine
+     * Medicine Schedule
      */
-    SCHEDULE_SAVE_SUCCESS(HttpStatus.CREATED, "SCHEDULE_201", "복약 스케줄이 저장되었습니다."),
-    SCHEDULE_READ_SUCCESS(HttpStatus.OK, "SCHEDULE_200", "복약 스케줄 조회에 성공하였습니다."),
-    SCHEDULE_DELETE_SUCCESS(HttpStatus.OK, "SCHEDULE_200_2", "복약 스케줄이 삭제되었습니다."),
-    RECORD_SYNC_SUCCESS(HttpStatus.OK, "RECORD_200", "복약 기록 동기화에 성공하였습니다."),
-    RECORD_READ_SUCCESS(HttpStatus.OK, "RECORD_200_2", "복약 기록 조회에 성공하였습니다.");
+    REGISTER_MEDICINE_SCHEDULE_SUCCESS(HttpStatus.CREATED, "SCHEDULE_201", "복약 스케줄이 저장되었습니다."),
+    GET_MEDICINE_SCHEDULE_SUCCESS(HttpStatus.OK, "SCHEDULE_200", "복약 스케줄 조회에 성공하였습니다."),
+    DELETE_MEDICINE_SCHEDULE_SUCCESS(HttpStatus.OK, "SCHEDULE_200_2", "복약 스케줄이 삭제되었습니다."),
+
+    /**
+     * Medication Record
+     */
+    SYNC_MEDICATION_RECORD_SUCCESS(HttpStatus.OK, "RECORD_200", "복약 기록 동기화에 성공하였습니다."),
+    GET_MEDICATION_RECORD_SUCCESS(HttpStatus.OK, "RECORD_200_2", "복약 기록 조회에 성공하였습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;

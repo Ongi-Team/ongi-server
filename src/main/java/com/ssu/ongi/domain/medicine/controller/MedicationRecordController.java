@@ -35,7 +35,7 @@ public class MedicationRecordController implements MedicationRecordControllerDoc
             @Valid @RequestBody MedicationRecordSyncRequest request
     ) {
         medicationRecordCommandService.syncOfflineRecords(request);
-        return ApiResponse.success(SuccessStatus.RECORD_SYNC_SUCCESS);
+        return ApiResponse.success(SuccessStatus.SYNC_MEDICATION_RECORD_SUCCESS);
     }
 
     @Override
@@ -45,7 +45,7 @@ public class MedicationRecordController implements MedicationRecordControllerDoc
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
     ) {
         List<MedicationRecordResponse> response = medicationRecordQueryService.getRecordsByDate(elderId, date);
-        return ApiResponse.success(SuccessStatus.RECORD_READ_SUCCESS, response);
+        return ApiResponse.success(SuccessStatus.GET_MEDICATION_RECORD_SUCCESS, response);
     }
 
     @Override
@@ -55,6 +55,6 @@ public class MedicationRecordController implements MedicationRecordControllerDoc
             @RequestParam Long elderId
     ) {
         List<MedicationRecordResponse> response = medicationRecordQueryService.getRecordsBySchedule(scheduleId, elderId);
-        return ApiResponse.success(SuccessStatus.RECORD_READ_SUCCESS, response);
+        return ApiResponse.success(SuccessStatus.GET_MEDICATION_RECORD_SUCCESS, response);
     }
 }

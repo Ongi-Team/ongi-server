@@ -35,7 +35,7 @@ public class MedicineScheduleController implements MedicineScheduleControllerDoc
             @Valid @RequestBody MedicineScheduleCreateRequest request
     ) {
         MedicineScheduleSaveResponse response = medicineScheduleCommandService.saveSchedules(request);
-        return ApiResponse.success(SuccessStatus.SCHEDULE_SAVE_SUCCESS, response);
+        return ApiResponse.success(SuccessStatus.REGISTER_MEDICINE_SCHEDULE_SUCCESS, response);
     }
 
     @Override
@@ -44,7 +44,7 @@ public class MedicineScheduleController implements MedicineScheduleControllerDoc
             @RequestParam Long elderId
     ) {
         List<MedicineScheduleResponse> response = medicineScheduleQueryService.getSchedules(elderId);
-        return ApiResponse.success(SuccessStatus.SCHEDULE_READ_SUCCESS, response);
+        return ApiResponse.success(SuccessStatus.GET_MEDICINE_SCHEDULE_SUCCESS, response);
     }
 
     @Override
@@ -54,6 +54,6 @@ public class MedicineScheduleController implements MedicineScheduleControllerDoc
             @RequestParam Long elderId
     ) {
         medicineScheduleCommandService.deleteSchedule(scheduleId, elderId);
-        return ApiResponse.success(SuccessStatus.SCHEDULE_DELETE_SUCCESS);
+        return ApiResponse.success(SuccessStatus.DELETE_MEDICINE_SCHEDULE_SUCCESS);
     }
 }
