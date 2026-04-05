@@ -15,11 +15,16 @@ public interface MedicineScheduleRepository extends JpaRepository<MedicineSchedu
 
     Optional<MedicineSchedule> findByIdAndMedicine_Elder_Id(Long scheduleId, Long elderId);
 
-    @Query("SELECT ms FROM MedicineSchedule ms " +
+    @Query("SELECT CASE WHEN COUNT(ms) > 0 THEN true ELSE false END " +
+            "FROM MedicineSchedule ms " +
             "WHERE ms.medicine.elder.id = :elderId AND ms.scheduledTime = :scheduledTime")
-    Optional<MedicineSchedule> findByElderIdAndScheduledTime(
+    boolean existsByElderIdAndScheduledTime(
             @Param("elderId") Long elderId,
             @Param("scheduledTime") LocalTime scheduledTime);
+
+    @Query("SELECT COALESCE(MAX(ms.dispenserSlot), 0) FROM MedicineSchedule ms " +
+            "WHERE ms.medicine.elder.id = :elderId")
+    int findMaxDispenserSlotByElderId(@Param("elderId") Long elderId);
 
     @Query("SELECT ms FROM MedicineSchedule ms " +
             "JOIN FETCH ms.medicine " +

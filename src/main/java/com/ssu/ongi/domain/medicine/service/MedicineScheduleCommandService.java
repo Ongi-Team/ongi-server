@@ -17,9 +17,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -40,17 +43,24 @@ public class MedicineScheduleCommandService {
                 .sorted(Comparator.comparing(ScheduleItem::scheduledTime))
                 .toList();
 
-        // 중복 시간 검증
+        // 요청 내 중복 시간 검증
+        Set<LocalTime> uniqueTimes = new HashSet<>();
         for (ScheduleItem item : sortedItems) {
-            medicineScheduleRepository.findByElderIdAndScheduledTime(elder.getId(), item.scheduledTime())
-                    .ifPresent(existing -> {
-                        throw new GeneralException(ErrorStatus.DUPLICATE_SCHEDULE_TIME);
-                    });
+            if (!uniqueTimes.add(item.scheduledTime())) {
+                throw new GeneralException(ErrorStatus.DUPLICATE_SCHEDULE_TIME);
+            }
         }
 
-        // Medicine + MedicineSchedule 생성 (dispenserSlot 자동 할당)
+        // 기존 DB 스케줄과 중복 시간 검증
+        for (ScheduleItem item : sortedItems) {
+            if (medicineScheduleRepository.existsByElderIdAndScheduledTime(elder.getId(), item.scheduledTime())) {
+                throw new GeneralException(ErrorStatus.DUPLICATE_SCHEDULE_TIME);
+            }
+        }
+
+        // Medicine + MedicineSchedule 생성 (dispenserSlot 자동 할당 - 기존 최대값 이후부터)
         List<MedicineSchedule> savedSchedules = new ArrayList<>();
-        int slot = 1;
+        int slot = medicineScheduleRepository.findMaxDispenserSlotByElderId(elder.getId()) + 1;
         for (ScheduleItem item : sortedItems) {
             Medicine medicine = medicineRepository.save(Medicine.create(elder, item.name()));
             MedicineSchedule schedule = MedicineSchedule.create(medicine, slot++, item.scheduledTime());
