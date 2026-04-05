@@ -1,6 +1,7 @@
 package com.ssu.ongi.domain.medicine.service;
 
 import com.ssu.ongi.domain.medicine.dto.response.LockTimeRangeResponse;
+import java.time.LocalTime;
 import com.ssu.ongi.domain.medicine.dto.response.MedicineScheduleResponse;
 import com.ssu.ongi.domain.medicine.entity.MedicineSchedule;
 import com.ssu.ongi.domain.medicine.repository.MedicineScheduleRepository;
@@ -34,7 +35,12 @@ public class MedicineScheduleQueryService {
 
         if (schedules.size() == 1) {
             var time = schedules.get(0).getScheduledTime();
-            return new LockTimeRangeResponse(time.minusMinutes(30), time);
+            var lockStart = time.minusMinutes(30);
+            // 자정 부근(00:00~00:29)인 경우 역전 방지
+            if (lockStart.isAfter(time)) {
+                lockStart = LocalTime.MIN;
+            }
+            return new LockTimeRangeResponse(lockStart, time);
         }
 
         var earliest = schedules.get(0).getScheduledTime();
