@@ -2,7 +2,7 @@ package com.ssu.ongi.domain.medicine.controller;
 
 import com.ssu.ongi.common.response.ApiResponse;
 import com.ssu.ongi.domain.medicine.dto.request.MedicationRecordSyncRequest;
-import com.ssu.ongi.domain.medicine.dto.response.MedicationRecordResponse;
+import com.ssu.ongi.domain.medicine.dto.response.MedicationIntakeResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -71,7 +71,7 @@ public interface MedicationRecordControllerDocs {
                                     """))
             )
     })
-    ResponseEntity<ApiResponse<List<MedicationRecordResponse>>> getRecordsByDate(
+    ResponseEntity<ApiResponse<List<MedicationIntakeResponse>>> getRecordsByDate(
             @Parameter(description = "어르신 ID", required = true, example = "1")
             @RequestParam Long elderId,
             @Parameter(description = "조회 날짜 (yyyy-MM-dd)", required = true, example = "2026-04-05")
@@ -97,7 +97,7 @@ public interface MedicationRecordControllerDocs {
                                     """))
             )
     })
-    ResponseEntity<ApiResponse<List<MedicationRecordResponse>>> getRecordsBySchedule(
+    ResponseEntity<ApiResponse<List<MedicationIntakeResponse>>> getRecordsBySchedule(
             @Parameter(description = "스케줄 ID", required = true, example = "1")
             @PathVariable Long scheduleId,
             @Parameter(description = "어르신 ID", required = true, example = "1")

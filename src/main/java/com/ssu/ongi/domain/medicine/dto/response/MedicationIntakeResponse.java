@@ -6,15 +6,15 @@ import com.ssu.ongi.domain.medicine.enums.MedicationResult;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
-public record MedicationRecordResponse(
+public record MedicationIntakeResponse(
         Long recordId,
         String medicineName,
         LocalTime scheduledTime,
         MedicationResult result,
         LocalDateTime recordedAt
 ) {
-    public static MedicationRecordResponse from(MedicationRecord record) {
-        return new MedicationRecordResponse(
+    public static MedicationIntakeResponse from(MedicationRecord record) {
+        return new MedicationIntakeResponse(
                 record.getId(),
                 record.getMedicineSchedule().getMedicine().getName(),
                 record.getMedicineSchedule().getScheduledTime(),
