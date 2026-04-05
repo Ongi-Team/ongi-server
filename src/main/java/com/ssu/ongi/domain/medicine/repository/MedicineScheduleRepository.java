@@ -36,4 +36,6 @@ public interface MedicineScheduleRepository extends JpaRepository<MedicineSchedu
     Optional<MedicineSchedule> findByElderIdAndDispenserSlot(
             @Param("elderId") Long elderId,
             @Param("dispenserSlot") Integer dispenserSlot);
+
+    boolean existsByMedicineId(Long medicineId);
 }

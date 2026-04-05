@@ -10,7 +10,11 @@ import lombok.NoArgsConstructor;
 import java.time.LocalTime;
 
 @Entity
-@Table(name = "medicine_schedule")
+@Table(name = "medicine_schedule",
+        uniqueConstraints = @UniqueConstraint(
+                name = "uk_elder_dispenser_slot",
+                columnNames = {"medicine_id", "dispenser_slot"}
+        ))
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MedicineSchedule extends BaseEntity {

@@ -85,6 +85,9 @@ public class MedicineScheduleCommandService {
         medicationRecordRepository.deleteAllByMedicineScheduleId(scheduleId);
         Medicine medicine = schedule.getMedicine();
         medicineScheduleRepository.delete(schedule);
-        medicineRepository.delete(medicine);
+
+        if (!medicineScheduleRepository.existsByMedicineId(medicine.getId())) {
+            medicineRepository.delete(medicine);
+        }
     }
 }
