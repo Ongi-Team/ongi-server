@@ -5,7 +5,7 @@ import com.ssu.ongi.common.status.ErrorStatus;
 import com.ssu.ongi.domain.elder.entity.Elder;
 import com.ssu.ongi.domain.elder.repository.ElderRepository;
 import com.ssu.ongi.domain.medicine.dto.request.MedicineScheduleCreateRequest;
-import com.ssu.ongi.domain.medicine.dto.request.ScheduleItem;
+import com.ssu.ongi.domain.medicine.dto.request.MedicineScheduleItem;
 import com.ssu.ongi.domain.medicine.dto.response.LockTimeRangeResponse;
 import com.ssu.ongi.domain.medicine.dto.response.MedicineScheduleResponse;
 import com.ssu.ongi.domain.medicine.dto.response.MedicineScheduleSaveResponse;
@@ -41,20 +41,20 @@ public class MedicineScheduleCommandService {
                 .orElseThrow(() -> new GeneralException(ErrorStatus.ELDER_NOT_FOUND));
 
         // scheduledTime 기준 오름차순 정렬
-        List<ScheduleItem> sortedItems = request.schedules().stream()
-                .sorted(Comparator.comparing(ScheduleItem::scheduledTime))
+        List<MedicineScheduleItem> sortedItems = request.schedules().stream()
+                .sorted(Comparator.comparing(MedicineScheduleItem::scheduledTime))
                 .toList();
 
         // 요청 내 중복 시간 검증
         Set<LocalTime> uniqueTimes = new HashSet<>();
-        for (ScheduleItem item : sortedItems) {
+        for (MedicineScheduleItem item : sortedItems) {
             if (!uniqueTimes.add(item.scheduledTime())) {
                 throw new GeneralException(ErrorStatus.DUPLICATE_SCHEDULE_TIME);
             }
         }
 
         // 기존 DB 스케줄과 중복 시간 검증
-        for (ScheduleItem item : sortedItems) {
+        for (MedicineScheduleItem item : sortedItems) {
             if (medicineScheduleRepository.existsByElderIdAndScheduledTime(elder.getId(), item.scheduledTime())) {
                 throw new GeneralException(ErrorStatus.DUPLICATE_SCHEDULE_TIME);
             }
@@ -63,7 +63,7 @@ public class MedicineScheduleCommandService {
         // Medicine + MedicineSchedule 생성 (dispenserSlot 자동 할당 - 기존 최대값 이후부터)
         List<MedicineSchedule> savedSchedules = new ArrayList<>();
         int slot = medicineScheduleRepository.findMaxDispenserSlotByElderId(elder.getId()) + 1;
-        for (ScheduleItem item : sortedItems) {
+        for (MedicineScheduleItem item : sortedItems) {
             Medicine medicine = medicineRepository.save(Medicine.create(elder, item.name()));
             MedicineSchedule schedule = MedicineSchedule.create(medicine, slot++, item.scheduledTime());
             savedSchedules.add(medicineScheduleRepository.save(schedule));
