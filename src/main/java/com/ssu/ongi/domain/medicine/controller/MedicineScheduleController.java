@@ -2,7 +2,7 @@ package com.ssu.ongi.domain.medicine.controller;
 
 import com.ssu.ongi.common.response.ApiResponse;
 import com.ssu.ongi.common.status.SuccessStatus;
-import com.ssu.ongi.domain.medicine.dto.request.MedicineScheduleCreateRequest;
+import com.ssu.ongi.domain.medicine.dto.request.RegisterMedicineScheduleRequest;
 import com.ssu.ongi.domain.medicine.dto.response.MedicineScheduleResponse;
 import com.ssu.ongi.domain.medicine.dto.response.MedicineScheduleSaveResponse;
 import com.ssu.ongi.domain.medicine.service.MedicineScheduleCommandService;
@@ -32,7 +32,7 @@ public class MedicineScheduleController implements MedicineScheduleControllerDoc
     @Override
     @PostMapping
     public ResponseEntity<ApiResponse<MedicineScheduleSaveResponse>> saveSchedules(
-            @Valid @RequestBody MedicineScheduleCreateRequest request
+            @Valid @RequestBody RegisterMedicineScheduleRequest request
     ) {
         MedicineScheduleSaveResponse response = medicineScheduleCommandService.saveSchedules(request);
         return ApiResponse.success(SuccessStatus.REGISTER_MEDICINE_SCHEDULE_SUCCESS, response);

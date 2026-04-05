@@ -1,7 +1,7 @@
 package com.ssu.ongi.domain.medicine.controller;
 
 import com.ssu.ongi.common.response.ApiResponse;
-import com.ssu.ongi.domain.medicine.dto.request.MedicineScheduleCreateRequest;
+import com.ssu.ongi.domain.medicine.dto.request.RegisterMedicineScheduleRequest;
 import com.ssu.ongi.domain.medicine.dto.response.MedicineScheduleResponse;
 import com.ssu.ongi.domain.medicine.dto.response.MedicineScheduleSaveResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -70,7 +70,7 @@ public interface MedicineScheduleControllerDocs {
             )
     })
     ResponseEntity<ApiResponse<MedicineScheduleSaveResponse>> saveSchedules(
-            @Valid @RequestBody MedicineScheduleCreateRequest request
+            @Valid @RequestBody RegisterMedicineScheduleRequest request
     );
 
     @Operation(summary = "복약 스케줄 목록 조회", description = "어르신의 전체 복약 스케줄을 시간순으로 조회합니다.")

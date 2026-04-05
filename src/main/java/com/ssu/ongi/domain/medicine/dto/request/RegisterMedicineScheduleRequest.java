@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Size;
 
 import java.util.List;
 
-public record MedicineScheduleCreateRequest(
+public record RegisterMedicineScheduleRequest(
         @NotNull(message = "어르신 ID는 필수입니다.")
         Long elderId,
 

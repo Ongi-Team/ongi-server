@@ -4,7 +4,7 @@ import com.ssu.ongi.common.exception.GeneralException;
 import com.ssu.ongi.common.status.ErrorStatus;
 import com.ssu.ongi.domain.elder.entity.Elder;
 import com.ssu.ongi.domain.elder.repository.ElderRepository;
-import com.ssu.ongi.domain.medicine.dto.request.MedicineScheduleCreateRequest;
+import com.ssu.ongi.domain.medicine.dto.request.RegisterMedicineScheduleRequest;
 import com.ssu.ongi.domain.medicine.dto.request.MedicineScheduleItem;
 import com.ssu.ongi.domain.medicine.dto.response.LockTimeRangeResponse;
 import com.ssu.ongi.domain.medicine.dto.response.MedicineScheduleResponse;
@@ -36,7 +36,7 @@ public class MedicineScheduleCommandService {
     private final ElderRepository elderRepository;
     private final MedicineScheduleQueryService medicineScheduleQueryService;
 
-    public MedicineScheduleSaveResponse saveSchedules(MedicineScheduleCreateRequest request) {
+    public MedicineScheduleSaveResponse saveSchedules(RegisterMedicineScheduleRequest request) {
         Elder elder = elderRepository.findById(request.elderId())
                 .orElseThrow(() -> new GeneralException(ErrorStatus.ELDER_NOT_FOUND));
 
