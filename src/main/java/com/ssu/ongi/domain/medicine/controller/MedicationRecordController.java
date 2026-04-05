@@ -30,7 +30,7 @@ public class MedicationRecordController implements MedicationRecordControllerDoc
     private final MedicationRecordQueryService medicationRecordQueryService;
 
     @Override
-    @PostMapping("/sync")
+    @PostMapping
     public ResponseEntity<ApiResponse<Void>> syncRecords(
             @Valid @RequestBody MedicationRecordSyncRequest request
     ) {
