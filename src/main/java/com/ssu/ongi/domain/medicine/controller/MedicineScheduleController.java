@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/medicines/schedules")
+@RequestMapping("/api/medicine/schedules")
 @RequiredArgsConstructor
 public class MedicineScheduleController implements MedicineScheduleControllerDocs {
 

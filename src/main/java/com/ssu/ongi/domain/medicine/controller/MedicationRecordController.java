@@ -22,7 +22,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/medicines/medications")
+@RequestMapping("/api/medicine/medications")
 @RequiredArgsConstructor
 public class MedicationRecordController implements MedicationRecordControllerDocs {
 
