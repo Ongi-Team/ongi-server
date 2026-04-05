@@ -31,8 +31,8 @@ public class MedicationRecordCommandService {
     private final MedicineScheduleRepository medicineScheduleRepository;
     private final DeviceRepository deviceRepository;
 
-    public void saveRecord(Long deviceId, Integer dispenserSlot,
-                           MedicationResult result, LocalDateTime recordedAt) {
+    public void saveMedicationIntake(Long deviceId, Integer dispenserSlot,
+                                    MedicationResult result, LocalDateTime recordedAt) {
         Device device = deviceRepository.findById(deviceId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.DEVICE_NOT_FOUND));
 
@@ -50,7 +50,7 @@ public class MedicationRecordCommandService {
         medicationRecordRepository.save(record);
     }
 
-    public void syncOfflineRecords(MedicationRecordSyncRequest request) {
+    public void saveMedicationIntakes(MedicationRecordSyncRequest request) {
         // 필요한 Device 일괄 조회
         Set<Long> deviceIds = request.records().stream()
                 .map(MedicationIntakeItem::deviceId)

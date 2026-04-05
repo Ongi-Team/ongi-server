@@ -34,7 +34,7 @@ public class MedicationRecordController implements MedicationRecordControllerDoc
     public ResponseEntity<ApiResponse<Void>> syncRecords(
             @Valid @RequestBody MedicationRecordSyncRequest request
     ) {
-        medicationRecordCommandService.syncOfflineRecords(request);
+        medicationRecordCommandService.saveMedicationIntakes(request);
         return ApiResponse.success(SuccessStatus.SYNC_MEDICATION_RECORD_SUCCESS);
     }
 
