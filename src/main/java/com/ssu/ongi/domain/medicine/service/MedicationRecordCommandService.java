@@ -16,6 +16,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -37,7 +42,6 @@ public class MedicationRecordCommandService {
                 .findByElderIdAndDispenserSlot(elderId, dispenserSlot)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.SCHEDULE_NOT_FOUND));
 
-        // 중복 이벤트 무시 (idempotent)
         if (medicationRecordRepository.existsByMedicineScheduleIdAndRecordedAt(schedule.getId(), recordedAt)) {
             return;
         }
@@ -47,8 +51,35 @@ public class MedicationRecordCommandService {
     }
 
     public void syncOfflineRecords(MedicationRecordSyncRequest request) {
+        // 필요한 Device 일괄 조회
+        Set<Long> deviceIds = request.records().stream()
+                .map(MedicationRecordItem::deviceId)
+                .collect(Collectors.toSet());
+        Map<Long, Device> deviceMap = deviceRepository.findAllById(deviceIds).stream()
+                .collect(Collectors.toMap(Device::getId, d -> d));
+
+        List<MedicationRecord> toSave = new ArrayList<>();
+
         for (MedicationRecordItem item : request.records()) {
-            saveRecord(item.deviceId(), item.dispenserSlot(), item.result(), item.recordedAt());
+            Device device = deviceMap.get(item.deviceId());
+            if (device == null) {
+                throw new GeneralException(ErrorStatus.DEVICE_NOT_FOUND);
+            }
+
+            Long elderId = device.getElder().getId();
+            MedicineSchedule schedule = medicineScheduleRepository
+                    .findByElderIdAndDispenserSlot(elderId, item.dispenserSlot())
+                    .orElseThrow(() -> new GeneralException(ErrorStatus.SCHEDULE_NOT_FOUND));
+
+            if (medicationRecordRepository.existsByMedicineScheduleIdAndRecordedAt(schedule.getId(), item.recordedAt())) {
+                continue;
+            }
+
+            toSave.add(MedicationRecord.create(schedule, device, item.result(), item.recordedAt()));
+        }
+
+        if (!toSave.isEmpty()) {
+            medicationRecordRepository.saveAll(toSave);
         }
     }
 }
