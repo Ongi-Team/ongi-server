@@ -4,7 +4,7 @@ import com.ssu.ongi.common.exception.GeneralException;
 import com.ssu.ongi.common.status.ErrorStatus;
 import com.ssu.ongi.domain.device.entity.Device;
 import com.ssu.ongi.domain.device.repository.DeviceRepository;
-import com.ssu.ongi.domain.medicine.dto.request.MedicationRecordItem;
+import com.ssu.ongi.domain.medicine.dto.request.MedicationIntakeItem;
 import com.ssu.ongi.domain.medicine.dto.request.MedicationRecordSyncRequest;
 import com.ssu.ongi.domain.medicine.entity.MedicationRecord;
 import com.ssu.ongi.domain.medicine.entity.MedicineSchedule;
@@ -53,14 +53,14 @@ public class MedicationRecordCommandService {
     public void syncOfflineRecords(MedicationRecordSyncRequest request) {
         // 필요한 Device 일괄 조회
         Set<Long> deviceIds = request.records().stream()
-                .map(MedicationRecordItem::deviceId)
+                .map(MedicationIntakeItem::deviceId)
                 .collect(Collectors.toSet());
         Map<Long, Device> deviceMap = deviceRepository.findAllById(deviceIds).stream()
                 .collect(Collectors.toMap(Device::getId, d -> d));
 
         List<MedicationRecord> toSave = new ArrayList<>();
 
-        for (MedicationRecordItem item : request.records()) {
+        for (MedicationIntakeItem item : request.records()) {
             Device device = deviceMap.get(item.deviceId());
             if (device == null) {
                 throw new GeneralException(ErrorStatus.DEVICE_NOT_FOUND);
