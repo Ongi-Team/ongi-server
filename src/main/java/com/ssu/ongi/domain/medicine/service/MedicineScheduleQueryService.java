@@ -19,7 +19,7 @@ public class MedicineScheduleQueryService {
     private final MedicineScheduleRepository medicineScheduleRepository;
 
     public List<MedicineScheduleResponse> getSchedules(Long elderId) {
-        return medicineScheduleRepository.findAllByMedicine_Elder_IdOrderByScheduledTimeAsc(elderId)
+        return medicineScheduleRepository.findAllByElderIdWithMedicine(elderId)
                 .stream()
                 .map(MedicineScheduleResponse::from)
                 .toList();
@@ -27,7 +27,7 @@ public class MedicineScheduleQueryService {
 
     public LockTimeRangeResponse calculateLockTimeRange(Long elderId) {
         List<MedicineSchedule> schedules =
-                medicineScheduleRepository.findAllByMedicine_Elder_IdOrderByScheduledTimeAsc(elderId);
+                medicineScheduleRepository.findAllByElderIdWithMedicine(elderId);
 
         if (schedules.isEmpty()) {
             return null;
