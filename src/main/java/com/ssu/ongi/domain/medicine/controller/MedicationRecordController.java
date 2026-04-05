@@ -51,9 +51,10 @@ public class MedicationRecordController implements MedicationRecordControllerDoc
     @Override
     @GetMapping("/schedule/{scheduleId}")
     public ResponseEntity<ApiResponse<List<MedicationRecordResponse>>> getRecordsBySchedule(
-            @PathVariable Long scheduleId
+            @PathVariable Long scheduleId,
+            @RequestParam Long elderId
     ) {
-        List<MedicationRecordResponse> response = medicationRecordQueryService.getRecordsBySchedule(scheduleId);
+        List<MedicationRecordResponse> response = medicationRecordQueryService.getRecordsBySchedule(scheduleId, elderId);
         return ApiResponse.success(SuccessStatus.RECORD_READ_SUCCESS, response);
     }
 }

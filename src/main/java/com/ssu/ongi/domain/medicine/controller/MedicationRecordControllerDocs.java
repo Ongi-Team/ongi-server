@@ -99,6 +99,8 @@ public interface MedicationRecordControllerDocs {
     })
     ResponseEntity<ApiResponse<List<MedicationRecordResponse>>> getRecordsBySchedule(
             @Parameter(description = "스케줄 ID", required = true, example = "1")
-            @PathVariable Long scheduleId
+            @PathVariable Long scheduleId,
+            @Parameter(description = "어르신 ID", required = true, example = "1")
+            @RequestParam Long elderId
     );
 }
