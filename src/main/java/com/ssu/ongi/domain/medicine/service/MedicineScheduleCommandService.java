@@ -11,6 +11,7 @@ import com.ssu.ongi.domain.medicine.dto.response.MedicineScheduleResponse;
 import com.ssu.ongi.domain.medicine.dto.response.MedicineScheduleSaveResponse;
 import com.ssu.ongi.domain.medicine.entity.Medicine;
 import com.ssu.ongi.domain.medicine.entity.MedicineSchedule;
+import com.ssu.ongi.domain.medicine.repository.MedicationRecordRepository;
 import com.ssu.ongi.domain.medicine.repository.MedicineRepository;
 import com.ssu.ongi.domain.medicine.repository.MedicineScheduleRepository;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,7 @@ public class MedicineScheduleCommandService {
 
     private final MedicineRepository medicineRepository;
     private final MedicineScheduleRepository medicineScheduleRepository;
+    private final MedicationRecordRepository medicationRecordRepository;
     private final ElderRepository elderRepository;
     private final MedicineScheduleQueryService medicineScheduleQueryService;
 
@@ -80,6 +82,9 @@ public class MedicineScheduleCommandService {
         MedicineSchedule schedule = medicineScheduleRepository.findByIdAndMedicine_Elder_Id(scheduleId, elderId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.SCHEDULE_NOT_FOUND));
 
+        medicationRecordRepository.deleteAllByMedicineScheduleId(scheduleId);
+        Medicine medicine = schedule.getMedicine();
         medicineScheduleRepository.delete(schedule);
+        medicineRepository.delete(medicine);
     }
 }

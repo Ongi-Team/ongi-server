@@ -12,6 +12,8 @@ public interface MedicationRecordRepository extends JpaRepository<MedicationReco
 
     boolean existsByMedicineScheduleIdAndRecordedAt(Long scheduleId, LocalDateTime recordedAt);
 
+    void deleteAllByMedicineScheduleId(Long scheduleId);
+
     @Query("SELECT mr FROM MedicationRecord mr " +
             "JOIN FETCH mr.medicineSchedule ms " +
             "JOIN FETCH ms.medicine " +
