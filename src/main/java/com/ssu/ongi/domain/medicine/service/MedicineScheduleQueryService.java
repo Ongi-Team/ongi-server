@@ -33,18 +33,15 @@ public class MedicineScheduleQueryService {
             return null;
         }
 
-        if (schedules.size() == 1) {
-            var time = schedules.get(0).getScheduledTime();
-            var lockStart = time.minusMinutes(30);
-            // 자정 부근(00:00~00:29)인 경우 역전 방지
-            if (lockStart.isAfter(time)) {
-                lockStart = LocalTime.MIN;
-            }
-            return new LockTimeRangeResponse(lockStart, time);
-        }
-
         var earliest = schedules.get(0).getScheduledTime();
         var latest = schedules.get(schedules.size() - 1).getScheduledTime();
-        return new LockTimeRangeResponse(earliest, latest);
+
+        var lockStart = safeMinusMinutes(earliest, 30);
+        return new LockTimeRangeResponse(lockStart, latest);
+    }
+
+    private LocalTime safeMinusMinutes(LocalTime time, int minutes) {
+        var result = time.minusMinutes(minutes);
+        return result.isAfter(time) ? LocalTime.MIN : result;
     }
 }
