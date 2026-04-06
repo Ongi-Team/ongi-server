@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.time.LocalDate;
 import java.util.List;
 
-@Tag(name = "Medication Record", description = "복약 기록 API")
+@Tag(name = "Medicine Medication", description = "복약 기록 API")
 public interface MedicationRecordControllerDocs {
 
     @Operation(summary = "오프라인 복약 기록 동기화", description = "디바이스에서 수집된 복약 기록을 일괄 동기화합니다. 중복 기록은 자동으로 무시됩니다.")
