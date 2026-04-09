@@ -11,12 +11,6 @@ import java.util.Optional;
 
 public interface MedicineScheduleRepository extends JpaRepository<MedicineSchedule, Long> {
 
-    @Query("SELECT ms FROM MedicineSchedule ms " +
-            "JOIN FETCH ms.medicine " +
-            "WHERE ms.medicine.elder.id = :elderId " +
-            "ORDER BY ms.scheduledTime ASC")
-    List<MedicineSchedule> findAllByElderIdWithMedicine(@Param("elderId") Long elderId);
-
     Optional<MedicineSchedule> findByIdAndMedicine_Elder_Id(Long scheduleId, Long elderId);
 
     @Query("SELECT CASE WHEN COUNT(ms) > 0 THEN true ELSE false END " +

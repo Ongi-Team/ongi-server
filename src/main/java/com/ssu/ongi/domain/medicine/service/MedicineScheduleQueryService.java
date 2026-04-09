@@ -1,10 +1,11 @@
 package com.ssu.ongi.domain.medicine.service;
 
+import com.ssu.ongi.domain.elder.service.ElderQueryService;
 import com.ssu.ongi.domain.medicine.dto.response.LockTimeRangeResponse;
 import java.time.LocalTime;
 import com.ssu.ongi.domain.medicine.dto.response.MedicineScheduleResponse;
 import com.ssu.ongi.domain.medicine.entity.MedicineSchedule;
-import com.ssu.ongi.domain.medicine.repository.MedicineScheduleRepository;
+import com.ssu.ongi.domain.medicine.repository.MedicineScheduleQueryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,10 +17,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MedicineScheduleQueryService {
 
-    private final MedicineScheduleRepository medicineScheduleRepository;
+    private final ElderQueryService elderQueryService;
+    private final MedicineScheduleQueryRepository medicineScheduleQueryRepository;
 
-    public List<MedicineScheduleResponse> getSchedules(Long elderId) {
-        return medicineScheduleRepository.findAllByElderIdWithMedicine(elderId)
+    public List<MedicineScheduleResponse> getSchedules(Long memberId, Long elderId) {
+        elderQueryService.getElderByIdAndMemberId(elderId, memberId);
+
+        return medicineScheduleQueryRepository.findAllByElderId(elderId)
                 .stream()
                 .map(MedicineScheduleResponse::from)
                 .toList();
@@ -27,7 +31,7 @@ public class MedicineScheduleQueryService {
 
     public LockTimeRangeResponse calculateLockTimeRange(Long elderId) {
         List<MedicineSchedule> schedules =
-                medicineScheduleRepository.findAllByElderIdWithMedicine(elderId);
+                medicineScheduleQueryRepository.findAllByElderId(elderId);
 
         if (schedules.isEmpty()) {
             return null;

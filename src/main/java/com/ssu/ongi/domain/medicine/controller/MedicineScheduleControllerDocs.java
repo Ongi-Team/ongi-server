@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -93,6 +94,7 @@ public interface MedicineScheduleControllerDocs {
             )
     })
     ResponseEntity<ApiResponse<List<MedicineScheduleResponse>>> getSchedules(
+            @AuthenticationPrincipal Long memberId,
             @Parameter(description = "어르신 ID", required = true, example = "1")
             @RequestParam Long elderId
     );

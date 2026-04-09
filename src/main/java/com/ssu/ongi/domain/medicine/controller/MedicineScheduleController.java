@@ -10,6 +10,7 @@ import com.ssu.ongi.domain.medicine.service.MedicineScheduleQueryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,9 +42,10 @@ public class MedicineScheduleController implements MedicineScheduleControllerDoc
     @Override
     @GetMapping
     public ResponseEntity<ApiResponse<List<MedicineScheduleResponse>>> getSchedules(
+            @AuthenticationPrincipal Long memberId,
             @RequestParam Long elderId
     ) {
-        List<MedicineScheduleResponse> response = medicineScheduleQueryService.getSchedules(elderId);
+        List<MedicineScheduleResponse> response = medicineScheduleQueryService.getSchedules(memberId, elderId);
         return ApiResponse.success(SuccessStatus.GET_MEDICINE_SCHEDULE_SUCCESS, response);
     }
 
