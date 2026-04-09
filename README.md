@@ -128,7 +128,7 @@ src
 ```json
 {
   "isSuccess": true,
-  "code": "AREUMDAP_200",
+  "code": "ONGI_200",
   "message": "성공입니다.",
   "data": {}
 }
