@@ -42,6 +42,10 @@ public class SecurityConfig {
             "/api/auth/phone/verify"
     };
 
+    private static final String[] HEALTH_URIS = {
+            "/actuator/health"
+    };
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -51,6 +55,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(SWAGGER_URIS).permitAll()
                         .requestMatchers(AUTH_URIS).permitAll()
+                        .requestMatchers(HEALTH_URIS).permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
