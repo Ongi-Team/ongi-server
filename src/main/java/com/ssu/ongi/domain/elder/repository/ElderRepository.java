@@ -4,10 +4,10 @@ import com.ssu.ongi.domain.elder.entity.Elder;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ElderRepository extends JpaRepository<Elder, Long> {
 
-    List<Elder> findByMemberId(Long memberId);
+    Optional<Elder> findByIdAndMemberId(Long elderId, Long memberId);
 }

@@ -45,7 +45,19 @@ public enum ErrorStatus implements BaseStatus {
     JWT_INVALID(HttpStatus.UNAUTHORIZED, "JWT_401_2", "유효하지 않은 토큰입니다."),
     JWT_UNSUPPORTED(HttpStatus.UNAUTHORIZED, "JWT_401_3", "지원하지 않는 토큰 형식입니다."),
     JWT_MALFORMED(HttpStatus.BAD_REQUEST, "JWT_400", "잘못된 형식의 토큰입니다."),
-    JWT_REFRESH_TOKEN_REUSE(HttpStatus.UNAUTHORIZED, "JWT_401_4", "이미 사용된 토큰입니다. 다시 로그인해주세요.");
+    JWT_REFRESH_TOKEN_REUSE(HttpStatus.UNAUTHORIZED, "JWT_401_4", "이미 사용된 토큰입니다. 다시 로그인해주세요."),
+
+    /**
+     * Medicine
+     */
+    MEDICINE_NOT_FOUND(HttpStatus.NOT_FOUND, "MEDICINE_404", "약 정보를 찾을 수 없습니다."),
+    SCHEDULE_NOT_FOUND(HttpStatus.NOT_FOUND, "SCHEDULE_404", "복약 스케줄을 찾을 수 없습니다."),
+    DUPLICATE_SCHEDULE_TIME(HttpStatus.CONFLICT, "SCHEDULE_409", "동일한 시간에 이미 스케줄이 존재합니다."),
+
+    /**
+     * Device
+     */
+    DEVICE_NOT_FOUND(HttpStatus.NOT_FOUND, "DEVICE_404", "디바이스를 찾을 수 없습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;
