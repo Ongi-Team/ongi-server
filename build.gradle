@@ -63,6 +63,9 @@ dependencies {
 
     // SSH Tunneling (JSch)
     implementation 'com.github.mwiede:jsch:0.2.17'
+
+    // Actuator
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
 }
 
 tasks.named('test') {
