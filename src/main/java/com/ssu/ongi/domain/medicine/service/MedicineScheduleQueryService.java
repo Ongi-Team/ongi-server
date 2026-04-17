@@ -1,6 +1,8 @@
 package com.ssu.ongi.domain.medicine.service;
 
-import com.ssu.ongi.domain.elder.service.ElderQueryService;
+import com.ssu.ongi.common.exception.GeneralException;
+import com.ssu.ongi.common.status.ErrorStatus;
+import com.ssu.ongi.domain.elder.repository.ElderRepository;
 import com.ssu.ongi.domain.medicine.dto.response.LockTimeRangeResponse;
 import java.time.LocalTime;
 import com.ssu.ongi.domain.medicine.dto.response.MedicineScheduleResponse;
@@ -17,11 +19,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MedicineScheduleQueryService {
 
-    private final ElderQueryService elderQueryService;
+    private final ElderRepository elderRepository;
     private final MedicineScheduleQueryRepository medicineScheduleQueryRepository;
 
     public List<MedicineScheduleResponse> getSchedules(Long memberId, Long elderId) {
-        elderQueryService.getElderByIdAndMemberId(elderId, memberId);
+        elderRepository.findByIdAndMemberId(elderId, memberId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.ELDER_NOT_FOUND));
 
         return medicineScheduleQueryRepository.findAllByElderId(elderId)
                 .stream()
@@ -29,23 +32,20 @@ public class MedicineScheduleQueryService {
                 .toList();
     }
 
-    public LockTimeRangeResponse calculateLockTimeRange(Long elderId) {
-        List<MedicineSchedule> schedules =
-                medicineScheduleQueryRepository.findAllByElderId(elderId);
-
+    public LockTimeRangeResponse calculateLockTimeRange(List<MedicineSchedule> schedules) {
         if (schedules.isEmpty()) {
             return null;
         }
 
-        var earliest = schedules.get(0).getScheduledTime();
-        var latest = schedules.get(schedules.size() - 1).getScheduledTime();
+        LocalTime earliest = schedules.get(0).getScheduledTime();
+        LocalTime latest = schedules.get(schedules.size() - 1).getScheduledTime();
+        LocalTime lockStart = safeMinusMinutes(earliest, 30);
 
-        var lockStart = safeMinusMinutes(earliest, 30);
         return new LockTimeRangeResponse(lockStart, latest);
     }
 
     private LocalTime safeMinusMinutes(LocalTime time, int minutes) {
-        var result = time.minusMinutes(minutes);
+        LocalTime result = time.minusMinutes(minutes);
         return result.isAfter(time) ? LocalTime.MIN : result;
     }
 }

@@ -4,7 +4,6 @@ import com.ssu.ongi.common.response.ApiResponse;
 import com.ssu.ongi.common.status.SuccessStatus;
 import com.ssu.ongi.domain.medicine.dto.request.RegisterMedicineScheduleRequest;
 import com.ssu.ongi.domain.medicine.dto.response.MedicineScheduleResponse;
-import com.ssu.ongi.domain.medicine.dto.response.MedicineScheduleSaveResponse;
 import com.ssu.ongi.domain.medicine.service.MedicineScheduleCommandService;
 import com.ssu.ongi.domain.medicine.service.MedicineScheduleQueryService;
 import jakarta.validation.Valid;
@@ -32,11 +31,12 @@ public class MedicineScheduleController implements MedicineScheduleControllerDoc
 
     @Override
     @PostMapping
-    public ResponseEntity<ApiResponse<MedicineScheduleSaveResponse>> saveSchedules(
+    public ResponseEntity<ApiResponse<Void>> saveSchedules(
+            @AuthenticationPrincipal Long memberId,
             @Valid @RequestBody RegisterMedicineScheduleRequest request
     ) {
-        MedicineScheduleSaveResponse response = medicineScheduleCommandService.saveSchedules(request);
-        return ApiResponse.success(SuccessStatus.REGISTER_MEDICINE_SCHEDULE_SUCCESS, response);
+        medicineScheduleCommandService.saveSchedules(memberId, request);
+        return ApiResponse.success(SuccessStatus.REGISTER_MEDICINE_SCHEDULE_SUCCESS);
     }
 
     @Override

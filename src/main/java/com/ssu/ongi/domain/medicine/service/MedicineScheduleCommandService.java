@@ -8,7 +8,6 @@ import com.ssu.ongi.domain.medicine.dto.request.RegisterMedicineScheduleRequest;
 import com.ssu.ongi.domain.medicine.dto.request.MedicineScheduleItem;
 import com.ssu.ongi.domain.medicine.dto.response.LockTimeRangeResponse;
 import com.ssu.ongi.domain.medicine.dto.response.MedicineScheduleResponse;
-import com.ssu.ongi.domain.medicine.dto.response.MedicineScheduleSaveResponse;
 import com.ssu.ongi.domain.medicine.entity.Medicine;
 import com.ssu.ongi.domain.medicine.entity.MedicineSchedule;
 import com.ssu.ongi.domain.medicine.repository.MedicationRecordRepository;
@@ -21,9 +20,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -36,46 +35,64 @@ public class MedicineScheduleCommandService {
     private final ElderRepository elderRepository;
     private final MedicineScheduleQueryService medicineScheduleQueryService;
 
-    public MedicineScheduleSaveResponse saveSchedules(RegisterMedicineScheduleRequest request) {
-        Elder elder = elderRepository.findById(request.elderId())
+
+    /**
+     * 어르신 검증
+     * 정렬 중복 검증
+     * 약 등록
+     * */
+    public void saveSchedules(
+            Long memberId,
+            RegisterMedicineScheduleRequest request
+    ) {
+        Elder elder = elderRepository.findByIdAndMemberId(request.elderId(), memberId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.ELDER_NOT_FOUND));
 
-        // scheduledTime 기준 오름차순 정렬
-        List<MedicineScheduleItem> sortedItems = request.schedules().stream()
+        List<MedicineScheduleItem> sortedItems = validateAndSort(request.schedules(), elder.getId());
+        List<MedicineSchedule> savedSchedules = createAndSaveSchedules(elder, sortedItems);
+
+        // TODO 디바이스 스케줄에 직접 저장하는 코드를 호출해야 함
+        LockTimeRangeResponse lockTimeRange = medicineScheduleQueryService.calculateLockTimeRange(savedSchedules);
+    }
+
+    private List<MedicineScheduleItem> validateAndSort(List<MedicineScheduleItem> items, Long elderId) {
+        List<MedicineScheduleItem> sortedItems = items.stream()
                 .sorted(Comparator.comparing(MedicineScheduleItem::scheduledTime))
                 .toList();
 
         // 요청 내 중복 시간 검증
-        Set<LocalTime> uniqueTimes = new HashSet<>();
-        for (MedicineScheduleItem item : sortedItems) {
-            if (!uniqueTimes.add(item.scheduledTime())) {
-                throw new GeneralException(ErrorStatus.DUPLICATE_SCHEDULE_TIME);
-            }
+        Set<LocalTime> requestTimes = sortedItems.stream()
+                .map(MedicineScheduleItem::scheduledTime)
+                .collect(Collectors.toSet());
+        if (requestTimes.size() != sortedItems.size()) {
+            throw new GeneralException(ErrorStatus.DUPLICATE_SCHEDULE_TIME);
         }
 
         // 기존 DB 스케줄과 중복 시간 검증
         for (MedicineScheduleItem item : sortedItems) {
-            if (medicineScheduleRepository.existsByElderIdAndScheduledTime(elder.getId(), item.scheduledTime())) {
+            if (medicineScheduleRepository.existsByElderIdAndScheduledTime(elderId, item.scheduledTime())) {
                 throw new GeneralException(ErrorStatus.DUPLICATE_SCHEDULE_TIME);
             }
         }
 
-        // Medicine + MedicineSchedule 생성 (dispenserSlot 자동 할당 - 기존 최대값 이후부터)
-        List<MedicineSchedule> savedSchedules = new ArrayList<>();
+        return sortedItems;
+    }
+
+    private List<MedicineSchedule> createAndSaveSchedules(Elder elder, List<MedicineScheduleItem> sortedItems) {
+        // Medicine 일괄 저장 (배치 INSERT)
+        List<Medicine> medicines = sortedItems.stream()
+                .map(item -> Medicine.create(elder, item.name()))
+                .toList();
+        medicineRepository.saveAll(medicines);
+
+        // MedicineSchedule 일괄 저장 (dispenserSlot 자동 할당 - 기존 최대값 이후부터)
         int slot = medicineScheduleRepository.findMaxDispenserSlotByElderId(elder.getId()) + 1;
-        for (MedicineScheduleItem item : sortedItems) {
-            Medicine medicine = medicineRepository.save(Medicine.create(elder, item.name()));
-            MedicineSchedule schedule = MedicineSchedule.create(medicine, slot++, item.scheduledTime());
-            savedSchedules.add(medicineScheduleRepository.save(schedule));
+        List<MedicineSchedule> schedules = new ArrayList<>();
+        for (int i = 0; i < sortedItems.size(); i++) {
+            schedules.add(MedicineSchedule.create(medicines.get(i), slot++, sortedItems.get(i).scheduledTime()));
         }
 
-        List<MedicineScheduleResponse> scheduleResponses = savedSchedules.stream()
-                .map(MedicineScheduleResponse::from)
-                .toList();
-
-        LockTimeRangeResponse lockTimeRange = medicineScheduleQueryService.calculateLockTimeRange(elder.getId());
-
-        return new MedicineScheduleSaveResponse(scheduleResponses, lockTimeRange);
+        return medicineScheduleRepository.saveAll(schedules);
     }
 
     public void deleteSchedule(Long scheduleId, Long elderId) {

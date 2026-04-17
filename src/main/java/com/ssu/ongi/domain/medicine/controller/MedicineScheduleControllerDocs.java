@@ -29,7 +29,7 @@ public interface MedicineScheduleControllerDocs {
                     responseCode = "201",
                     description = "스케줄 저장 성공",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = MedicineScheduleSaveResponse.class),
+                            schema = @Schema(),
                             examples = @ExampleObject(value = """
                                     {
                                       "isSuccess": true,
@@ -70,7 +70,8 @@ public interface MedicineScheduleControllerDocs {
                                     """))
             )
     })
-    ResponseEntity<ApiResponse<MedicineScheduleSaveResponse>> saveSchedules(
+    ResponseEntity<ApiResponse<Void>> saveSchedules(
+            @AuthenticationPrincipal Long memberId,
             @Valid @RequestBody RegisterMedicineScheduleRequest request
     );
 
