@@ -3,6 +3,6 @@ spring:
     name: ongi
 
   profiles:
-    default: dev
+    default: prod
 
 
