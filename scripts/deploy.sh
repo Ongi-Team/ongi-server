@@ -6,6 +6,7 @@ GREEN_PORT=8081
 NGINX_CONF="/etc/nginx/sites-available/default"
 IMAGE="pooreumjung/ongi-backend:latest"
 ENV_FILE="/home/ubuntu/app/.env.prod"
+FIREBASE_JSON="/home/ubuntu/app/firebase-service-account.json"
 
 echo "=== Blue-Green Deploy Start ==="
 
@@ -59,6 +60,7 @@ docker run -d \
   --network ongi-net \
   -p ${NEW_PORT}:8080 \
   --env-file ${ENV_FILE} \
+  -v ${FIREBASE_JSON}:/home/ubuntu/app/firebase-service-account.json:ro \
   --memory="600m" \
   --restart unless-stopped \
   $IMAGE
