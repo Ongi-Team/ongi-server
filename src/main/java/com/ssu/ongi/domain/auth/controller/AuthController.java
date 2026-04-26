@@ -20,6 +20,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -71,6 +72,15 @@ public class AuthController implements AuthControllerDocs {
     ) {
         authCommandService.logout(memberId);
         return ApiResponse.success(SuccessStatus.LOGOUT_SUCCESS);
+    }
+
+    @Override
+    @DeleteMapping("/withdraw")
+    public ResponseEntity<ApiResponse<Void>> withdraw(
+            @AuthenticationPrincipal Long memberId
+    ) {
+        authCommandService.withdraw(memberId);
+        return ApiResponse.success(SuccessStatus.WITHDRAW_SUCCESS);
     }
 
     @Override

@@ -50,6 +50,11 @@ public class AuthCommandService {
         memberCommandService.deleteFcmToken(memberId);
     }
 
+    public void withdraw(Long memberId) {
+        tokenCommandService.logout(memberId);
+        memberCommandService.withdraw(memberId);
+    }
+
     public void updatePassword(UpdatePasswordRequest request) {
         phoneVerificationService.validateVerified(request.phone());
 

@@ -8,7 +8,10 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +19,8 @@ import java.util.List;
 @Table(name = "member")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE member SET deleted_at = NOW() WHERE member_id = ?")
+@SQLRestriction("deleted_at IS NULL")
 public class Member extends BaseEntity {
 
     @Id
@@ -41,6 +46,9 @@ public class Member extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "os_type")
     private OsType osType;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Elder> elders = new ArrayList<>();
@@ -74,6 +82,11 @@ public class Member extends BaseEntity {
     public void deleteFcmToken() {
         this.fcmToken = null;
         this.osType = null;
+    }
+
+    public void softDelete() {
+        this.loginId = "deleted_" + this.id + "_" + this.loginId;
+        this.deletedAt = LocalDateTime.now();
     }
 
     public void addElder(Elder elder) {
