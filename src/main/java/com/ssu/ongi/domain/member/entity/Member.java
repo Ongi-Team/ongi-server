@@ -8,7 +8,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
@@ -19,7 +18,6 @@ import java.util.List;
 @Table(name = "member")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@SQLDelete(sql = "UPDATE member SET deleted_at = NOW() WHERE member_id = ?")
 @SQLRestriction("deleted_at IS NULL")
 public class Member extends BaseEntity {
 
@@ -84,8 +82,15 @@ public class Member extends BaseEntity {
         this.osType = null;
     }
 
+    // 회원탈퇴 시 반드시 이 메서드만 사용 (memberRepository.delete() 직접 호출 금지)
     public void softDelete() {
         this.loginId = "deleted_" + this.id + "_" + this.loginId;
+        this.password = "";
+        this.name = "탈퇴한 사용자";
+        this.phone = "deleted_" + this.id + "_" + this.phone;
+        this.fcmToken = null;
+        this.osType = null;
+        this.elders.clear();  // orphanRemoval=true → Elder 행 삭제
         this.deletedAt = LocalDateTime.now();
     }
 
