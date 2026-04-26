@@ -61,8 +61,16 @@ public interface MemberControllerDocs {
     @Operation(summary = "FCM 토큰 삭제", description = "로그아웃 또는 회원탈퇴 시 FCM 토큰을 삭제합니다. 토큰이 없을 경우 무시됩니다.")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "204",
-                    description = "FCM 토큰 삭제 성공"
+                    responseCode = "200",
+                    description = "FCM 토큰 삭제 성공",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                                    {
+                                      "isSuccess": true,
+                                      "code": "MEMBER_200_2",
+                                      "message": "FCM 토큰이 삭제되었습니다."
+                                    }
+                                    """))
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "401",
