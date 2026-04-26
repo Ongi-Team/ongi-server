@@ -45,6 +45,11 @@ public class AuthCommandService {
         return LoginResponse.of(tokens.accessToken(), tokens.refreshToken(), request.loginMode(), member);
     }
 
+    public void logout(Long memberId) {
+        tokenCommandService.logout(memberId);
+        memberCommandService.deleteFcmToken(memberId);
+    }
+
     public void updatePassword(UpdatePasswordRequest request) {
         phoneVerificationService.validateVerified(request.phone());
 

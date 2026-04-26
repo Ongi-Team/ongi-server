@@ -38,6 +38,11 @@ public class TokenCommandService {
         return generateAndSave(memberId, loginMode);
     }
 
+    // 로그아웃 시 호출 - Redis의 RefreshToken 삭제
+    public void logout(Long memberId) {
+        refreshTokenRepository.delete(memberId);
+    }
+
     private TokenPair generateAndSave(Long memberId, LoginMode loginMode) {
         String accessToken = jwtTokenProvider.createAccessToken(memberId, loginMode);
         String refreshToken = jwtTokenProvider.createRefreshToken(memberId);

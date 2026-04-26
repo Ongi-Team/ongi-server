@@ -24,9 +24,9 @@ public enum ErrorStatus implements BaseStatus {
      * Auth
      */
     DUPLICATE_LOGIN_ID(HttpStatus.CONFLICT, "AUTH_409", "이미 사용 중인 아이디입니다."),
-    MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "AUTH_404", "회원을 찾을 수 없습니다."),
     INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "AUTH_401", "아이디 또는 비밀번호가 올바르지 않습니다."),
-    ELDER_NOT_FOUND(HttpStatus.NOT_FOUND, "AUTH_404_2", "어르신 정보를 찾을 수 없습니다."),
+    MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "AUTH_404", "회원을 찾을 수 없습니다."),
+    ELDER_NOT_FOUND(HttpStatus.NOT_FOUND, "AUTH_404", "어르신 정보를 찾을 수 없습니다."),
 
     /**
      * JWT
@@ -34,18 +34,18 @@ public enum ErrorStatus implements BaseStatus {
     /**
      * Phone Verification
      */
-    VERIFICATION_CODE_NOT_FOUND(HttpStatus.NOT_FOUND, "PHONE_404", "인증번호가 만료되었거나 존재하지 않습니다."),
     VERIFICATION_CODE_MISMATCH(HttpStatus.BAD_REQUEST, "PHONE_400", "인증번호가 일치하지 않습니다."),
     PHONE_NOT_VERIFIED(HttpStatus.UNAUTHORIZED, "PHONE_401", "전화번호 인증이 필요합니다."),
+    VERIFICATION_CODE_NOT_FOUND(HttpStatus.NOT_FOUND, "PHONE_404", "인증번호가 만료되었거나 존재하지 않습니다."),
 
     /**
      * JWT
      */
-    JWT_EXPIRED(HttpStatus.UNAUTHORIZED, "JWT_401_1", "만료된 토큰입니다."),
-    JWT_INVALID(HttpStatus.UNAUTHORIZED, "JWT_401_2", "유효하지 않은 토큰입니다."),
-    JWT_UNSUPPORTED(HttpStatus.UNAUTHORIZED, "JWT_401_3", "지원하지 않는 토큰 형식입니다."),
     JWT_MALFORMED(HttpStatus.BAD_REQUEST, "JWT_400", "잘못된 형식의 토큰입니다."),
-    JWT_REFRESH_TOKEN_REUSE(HttpStatus.UNAUTHORIZED, "JWT_401_4", "이미 사용된 토큰입니다. 다시 로그인해주세요."),
+    JWT_EXPIRED(HttpStatus.UNAUTHORIZED, "JWT_401", "만료된 토큰입니다."),
+    JWT_INVALID(HttpStatus.UNAUTHORIZED, "JWT_401", "유효하지 않은 토큰입니다."),
+    JWT_UNSUPPORTED(HttpStatus.UNAUTHORIZED, "JWT_401", "지원하지 않는 토큰 형식입니다."),
+    JWT_REFRESH_TOKEN_REUSE(HttpStatus.UNAUTHORIZED, "JWT_401", "이미 사용된 토큰입니다. 다시 로그인해주세요."),
 
     /**
      * Medicine
