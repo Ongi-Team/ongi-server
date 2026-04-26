@@ -19,6 +19,8 @@ import com.ssu.ongi.domain.auth.dto.response.LoginResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -61,6 +63,24 @@ public class AuthController implements AuthControllerDocs {
     ) {
         LoginResponse response = authCommandService.login(request);
         return ApiResponse.success(SuccessStatus.LOGIN_SUCCESS, response);
+    }
+
+    @Override
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse<Void>> logout(
+            @AuthenticationPrincipal Long memberId
+    ) {
+        authCommandService.logout(memberId);
+        return ApiResponse.success(SuccessStatus.LOGOUT_SUCCESS);
+    }
+
+    @Override
+    @DeleteMapping("/withdraw")
+    public ResponseEntity<ApiResponse<Void>> withdraw(
+            @AuthenticationPrincipal Long memberId
+    ) {
+        authCommandService.withdraw(memberId);
+        return ApiResponse.success(SuccessStatus.WITHDRAW_SUCCESS);
     }
 
     @Override

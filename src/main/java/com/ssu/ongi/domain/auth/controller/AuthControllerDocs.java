@@ -185,6 +185,66 @@ public interface AuthControllerDocs {
     ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody LoginRequest request);
 
 
+    @Operation(summary = "로그아웃", description = "RefreshToken을 폐기하고 FCM 토큰을 삭제합니다.")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "로그아웃 성공",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                                    {
+                                      "isSuccess": true,
+                                      "code": "AUTH_200_2",
+                                      "message": "로그아웃이 완료되었습니다."
+                                    }
+                                    """))
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "401",
+                    description = "인증 실패",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                                    {
+                                      "isSuccess": false,
+                                      "code": "COMMON_401",
+                                      "message": "인증이 필요합니다."
+                                    }
+                                    """))
+            )
+    })
+    ResponseEntity<ApiResponse<Void>> logout(Long memberId);
+
+
+    @Operation(summary = "회원탈퇴", description = "계정을 soft delete 처리하고 RefreshToken 및 FCM 토큰을 삭제합니다.")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "회원탈퇴 성공",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                                    {
+                                      "isSuccess": true,
+                                      "code": "AUTH_200_3",
+                                      "message": "회원탈퇴가 완료되었습니다."
+                                    }
+                                    """))
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "401",
+                    description = "인증 실패",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                                    {
+                                      "isSuccess": false,
+                                      "code": "COMMON_401",
+                                      "message": "인증이 필요합니다."
+                                    }
+                                    """))
+            )
+    })
+    ResponseEntity<ApiResponse<Void>> withdraw(Long memberId);
+
+
     @Operation(summary = "아이디 찾기", description = "전화번호로 아이디를 조회합니다.")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -238,7 +298,7 @@ public interface AuthControllerDocs {
                             examples = @ExampleObject(value = """
                                     {
                                       "isSuccess": true,
-                                      "code": "AUTH_200_1",
+                                      "code": "AUTH_200_3",
                                       "message": "비밀번호가 변경되었습니다."
                                     }
                                     """))

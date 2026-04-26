@@ -51,6 +51,12 @@ public class MemberCommandService {
         member.deleteFcmToken();
     }
 
+    public void withdraw(Long memberId) {
+        Member member = findMemberById(memberId);
+        member.deleteFcmToken();
+        member.softDelete();
+    }
+
     // 같은 기기에서 다른 계정으로 로그인 시 이전 계정의 FCM 토큰 초기화
     private void clearDuplicateFcmToken(Long memberId, String fcmToken) {
         memberRepository.findByFcmToken(fcmToken)
