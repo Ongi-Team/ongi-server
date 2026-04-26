@@ -30,7 +30,7 @@ public interface MemberControllerDocs {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "400",
-                    description = "FCM 토큰 누락",
+                    description = "FCM 토큰 또는 OS 타입 누락",
                     content = @Content(mediaType = "application/json",
                             examples = @ExampleObject(value = """
                                     {
@@ -57,4 +57,25 @@ public interface MemberControllerDocs {
             Long memberId,
             @Valid @RequestBody FcmTokenRequest request
     );
+
+    @Operation(summary = "FCM 토큰 삭제", description = "로그아웃 또는 회원탈퇴 시 FCM 토큰을 삭제합니다. 토큰이 없을 경우 무시됩니다.")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "204",
+                    description = "FCM 토큰 삭제 성공"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "401",
+                    description = "인증 실패",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                                    {
+                                      "isSuccess": false,
+                                      "code": "COMMON_401",
+                                      "message": "인증이 필요합니다."
+                                    }
+                                    """))
+            )
+    })
+    ResponseEntity<ApiResponse<Void>> deleteFcmToken(Long memberId);
 }

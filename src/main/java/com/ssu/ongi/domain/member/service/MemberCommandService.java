@@ -40,8 +40,17 @@ public class MemberCommandService {
     }
 
     public void registerFcmToken(Long memberId, FcmTokenRequest request) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+        Member member = findMemberById(memberId);
         member.updateFcmToken(request.fcmToken(), request.osType());
+    }
+
+    public void deleteFcmToken(Long memberId) {
+        Member member = findMemberById(memberId);
+        member.deleteFcmToken();
+    }
+
+    private Member findMemberById(Long memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
     }
 }
