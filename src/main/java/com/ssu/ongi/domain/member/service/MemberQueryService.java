@@ -17,6 +17,11 @@ public class MemberQueryService {
     private final MemberQueryRepository memberQueryRepository;
     private final PasswordEncoder passwordEncoder;
 
+    public Member findById(Long memberId) {
+        return memberQueryRepository.findById(memberId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+    }
+
     // 로그인 전용 - elders JOIN FETCH로 N+1 방지
     public Member findByLoginIdWithElders(String loginId) {
         return memberQueryRepository.findByLoginIdWithElders(loginId)

@@ -1,6 +1,6 @@
 package com.ssu.ongi.domain.auth.controller;
 
-import com.ssu.ongi.domain.member.dto.response.ReissueResponse;
+import com.ssu.ongi.domain.auth.dto.response.ReissueResponse;
 import com.ssu.ongi.common.response.ApiResponse;
 import com.ssu.ongi.domain.auth.dto.request.SendVerificationRequest;
 import com.ssu.ongi.domain.auth.dto.request.VerifyCodeRequest;
@@ -9,9 +9,9 @@ import com.ssu.ongi.domain.member.dto.request.LoginRequest;
 import com.ssu.ongi.domain.member.dto.request.ReissueRequest;
 import com.ssu.ongi.domain.member.dto.request.SignupRequest;
 import com.ssu.ongi.domain.member.dto.request.UpdatePasswordRequest;
-import com.ssu.ongi.domain.member.dto.response.CheckIdResponse;
-import com.ssu.ongi.domain.member.dto.response.FindIdResponse;
-import com.ssu.ongi.domain.member.dto.response.LoginResponse;
+import com.ssu.ongi.domain.auth.dto.response.CheckIdResponse;
+import com.ssu.ongi.domain.auth.dto.response.FindIdResponse;
+import com.ssu.ongi.domain.auth.dto.response.LoginResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;

@@ -2,6 +2,7 @@ package com.ssu.ongi.domain.member.service;
 
 import com.ssu.ongi.common.exception.GeneralException;
 import com.ssu.ongi.common.status.ErrorStatus;
+import com.ssu.ongi.domain.member.dto.request.FcmTokenRequest;
 import com.ssu.ongi.domain.member.dto.request.SignupRequest;
 import com.ssu.ongi.domain.member.entity.Member;
 import com.ssu.ongi.domain.member.repository.MemberRepository;
@@ -36,5 +37,29 @@ public class MemberCommandService {
 
     public void updatePassword(Member member, String newPassword) {
         member.updatePassword(passwordEncoder.encode(newPassword));
+    }
+
+    public void registerFcmToken(Long memberId, FcmTokenRequest request) {
+        clearDuplicateFcmToken(memberId, request.fcmToken());
+
+        Member member = findMemberById(memberId);
+        member.updateFcmToken(request.fcmToken(), request.osType());
+    }
+
+    public void deleteFcmToken(Long memberId) {
+        Member member = findMemberById(memberId);
+        member.deleteFcmToken();
+    }
+
+    // 같은 기기에서 다른 계정으로 로그인 시 이전 계정의 FCM 토큰 초기화
+    private void clearDuplicateFcmToken(Long memberId, String fcmToken) {
+        memberRepository.findByFcmToken(fcmToken)
+                .filter(other -> !other.getId().equals(memberId))
+                .ifPresent(Member::deleteFcmToken);
+    }
+
+    private Member findMemberById(Long memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
     }
 }

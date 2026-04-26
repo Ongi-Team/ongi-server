@@ -1,8 +1,9 @@
-package com.ssu.ongi.domain.member.dto.response;
+package com.ssu.ongi.domain.auth.dto.response;
 
 import com.ssu.ongi.common.exception.GeneralException;
 import com.ssu.ongi.common.status.ErrorStatus;
 import com.ssu.ongi.domain.elder.dto.response.ElderResponse;
+import com.ssu.ongi.domain.member.dto.response.MemberResponse;
 import com.ssu.ongi.domain.member.entity.Member;
 import com.ssu.ongi.domain.member.enums.LoginMode;
 

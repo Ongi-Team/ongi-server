@@ -33,7 +33,13 @@ public enum SuccessStatus implements BaseStatus {
      * Medication Record
      */
     SYNC_MEDICATION_RECORD_SUCCESS(HttpStatus.OK, "RECORD_200", "복약 기록 동기화에 성공하였습니다."),
-    GET_MEDICATION_RECORD_SUCCESS(HttpStatus.OK, "RECORD_200_2", "복약 기록 조회에 성공하였습니다.");
+    GET_MEDICATION_RECORD_SUCCESS(HttpStatus.OK, "RECORD_200_2", "복약 기록 조회에 성공하였습니다."),
+
+    /**
+     * Member
+     */
+    FCM_TOKEN_REGISTER_SUCCESS(HttpStatus.OK, "MEMBER_200", "FCM 토큰이 등록되었습니다."),
+    FCM_TOKEN_DELETE_SUCCESS(HttpStatus.OK, "MEMBER_200_2", "FCM 토큰이 삭제되었습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;
