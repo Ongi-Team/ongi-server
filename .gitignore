@@ -46,3 +46,6 @@ out/
 application-dev.yml
 application-prod.yml
 application-test.yml
+
+### firebase
+src/main/resources/firebase/
