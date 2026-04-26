@@ -2,15 +2,14 @@ package com.ssu.ongi.domain.auth.service;
 
 import com.ssu.ongi.common.jwt.TokenCommandService;
 import com.ssu.ongi.common.jwt.TokenPair;
-import com.ssu.ongi.domain.member.dto.response.ReissueResponse;
-import com.ssu.ongi.domain.auth.service.PhoneVerificationService;
+import com.ssu.ongi.domain.auth.dto.response.ReissueResponse;
 import com.ssu.ongi.domain.elder.entity.Elder;
 import com.ssu.ongi.domain.elder.service.ElderCommandService;
 import com.ssu.ongi.domain.member.dto.request.LoginRequest;
 import com.ssu.ongi.domain.member.dto.request.ReissueRequest;
 import com.ssu.ongi.domain.member.dto.request.SignupRequest;
 import com.ssu.ongi.domain.member.dto.request.UpdatePasswordRequest;
-import com.ssu.ongi.domain.member.dto.response.LoginResponse;
+import com.ssu.ongi.domain.auth.dto.response.LoginResponse;
 import com.ssu.ongi.domain.member.entity.Member;
 import com.ssu.ongi.domain.member.service.MemberCommandService;
 import com.ssu.ongi.domain.member.service.MemberQueryService;

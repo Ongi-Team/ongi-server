@@ -1,4 +1,4 @@
-package com.ssu.ongi.domain.member.dto.response;
+package com.ssu.ongi.domain.auth.dto.response;
 
 public record CheckIdResponse(
         boolean available

@@ -2,6 +2,7 @@ package com.ssu.ongi.domain.member.entity;
 
 import com.ssu.ongi.common.base.BaseEntity;
 import com.ssu.ongi.domain.elder.entity.Elder;
+import com.ssu.ongi.domain.member.enums.OsType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -34,8 +35,12 @@ public class Member extends BaseEntity {
     @Column(nullable = false)
     private String phone;
 
-    @Column(name = "fcm_token", length = 512, unique = true)
+    @Column(name = "fcm_token", length = 512)
     private String fcmToken;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "os_type")
+    private OsType osType;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Elder> elders = new ArrayList<>();
@@ -61,12 +66,14 @@ public class Member extends BaseEntity {
         this.password = password;
     }
 
-    public void updateFcmToken(String fcmToken) {
+    public void updateFcmToken(String fcmToken, OsType osType) {
         this.fcmToken = fcmToken;
+        this.osType = osType;
     }
 
     public void deleteFcmToken() {
         this.fcmToken = null;
+        this.osType = null;
     }
 
     public void addElder(Elder elder) {
