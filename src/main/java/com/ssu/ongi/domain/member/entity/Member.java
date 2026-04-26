@@ -34,6 +34,9 @@ public class Member extends BaseEntity {
     @Column(nullable = false)
     private String phone;
 
+    @Column(name = "fcm_token", length = 512, unique = true)
+    private String fcmToken;
+
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Elder> elders = new ArrayList<>();
 
@@ -56,6 +59,14 @@ public class Member extends BaseEntity {
 
     public void updatePassword(String password) {
         this.password = password;
+    }
+
+    public void updateFcmToken(String fcmToken) {
+        this.fcmToken = fcmToken;
+    }
+
+    public void deleteFcmToken() {
+        this.fcmToken = null;
     }
 
     public void addElder(Elder elder) {
