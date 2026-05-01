@@ -3,6 +3,7 @@ package com.ssu.ongi.domain.device.controller;
 import com.ssu.ongi.common.jwt.MemberPrincipal;
 import com.ssu.ongi.common.response.ApiResponse;
 import com.ssu.ongi.domain.device.dto.request.DeviceRegisterRequest;
+import com.ssu.ongi.domain.device.dto.response.RegisterDeviceResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -24,7 +25,10 @@ public interface DeviceControllerDocs {
                                     {
                                         "isSuccess": true,
                                         "code": "DEVICE_201",
-                                        "message": "디바이스가 등록되었습니다."
+                                        "message": "디바이스가 등록되었습니다.",
+                                        "data": {
+                                            "deviceToken": "550e8400-e29b-41d4-a716-446655440000"
+                                        }
                                     }
                                     """))
             ),
@@ -47,13 +51,13 @@ public interface DeviceControllerDocs {
                             examples = @ExampleObject(value = """
                                     {
                                         "isSuccess": false,
-                                        "code": "DEVICE_409",
-                                        "message": "이미 등록된 디바이스입니다."
+                                        "code": "COMMON_409",
+                                        "message": "이미 존재하는 데이터입니다."
                                     }
                                     """))
             )
     })
-    ResponseEntity<ApiResponse<Void>> registerDevice(
+    ResponseEntity<ApiResponse<RegisterDeviceResponse>> registerDevice(
             @AuthenticationPrincipal MemberPrincipal principal,
             @Valid @RequestBody DeviceRegisterRequest request
     );

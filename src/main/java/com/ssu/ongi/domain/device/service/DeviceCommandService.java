@@ -3,6 +3,7 @@ package com.ssu.ongi.domain.device.service;
 import com.ssu.ongi.common.exception.GeneralException;
 import com.ssu.ongi.common.status.ErrorStatus;
 import com.ssu.ongi.domain.device.dto.request.DeviceRegisterRequest;
+import com.ssu.ongi.domain.device.dto.response.RegisterDeviceResponse;
 import com.ssu.ongi.domain.device.entity.Device;
 import com.ssu.ongi.domain.device.repository.DeviceRepository;
 import com.ssu.ongi.domain.elder.entity.Elder;
@@ -20,11 +21,12 @@ public class DeviceCommandService {
     private final DeviceRepository deviceRepository;
     private final ElderQueryService elderQueryService;
 
-    public void registerDevice(Long memberId, LoginMode loginMode, DeviceRegisterRequest request) {
+    public RegisterDeviceResponse registerDevice(Long memberId, LoginMode loginMode, DeviceRegisterRequest request) {
         validateGuardianOnly(loginMode);
         Elder elder = elderQueryService.getElderByMemberId(memberId);
         Device device = Device.create(elder, request.serialNumber());
         deviceRepository.save(device);
+        return RegisterDeviceResponse.from(device);
     }
 
     private void validateGuardianOnly(LoginMode loginMode) {

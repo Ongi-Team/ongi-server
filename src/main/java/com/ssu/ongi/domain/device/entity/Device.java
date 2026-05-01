@@ -1,6 +1,7 @@
 package com.ssu.ongi.domain.device.entity;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import com.ssu.ongi.common.base.BaseEntity;
 import com.ssu.ongi.domain.device.enums.DeviceStatus;
@@ -29,24 +30,28 @@ public class Device extends BaseEntity {
     @Column(nullable = false)
     private String serialNumber;
 
+    @Column(nullable = false, unique = true)
+    private String deviceToken;
+
     // Heartbeat
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
-    private DeviceStatus status; // ONLINE
+    private DeviceStatus status;
 
-    @Column(name="uptimeSec")
-    private Long uptimeSec; // 부팅 후 경과 시간
+    @Column(name = "uptimeSec")
+    private Long uptimeSec;
 
     @Column(name = "rssi")
-    private Integer rssi; // measures the power of a received radio signal
+    private Integer rssi;
 
-    @Column(name="lastSeenAt")
+    @Column(name = "lastSeenAt")
     private LocalDateTime lastSeenAt;
 
     @Builder
     private Device(Elder elder, String serialNumber) {
         this.elder = elder;
         this.serialNumber = serialNumber;
+        this.deviceToken = UUID.randomUUID().toString();
     }
 
     public static Device create(Elder elder, String serialNumber) {
@@ -56,7 +61,7 @@ public class Device extends BaseEntity {
                 .build();
     }
 
-    public void updateHeartbeat(DeviceStatus status, Long uptimeSec, Integer rssi){
+    public void updateHeartbeat(DeviceStatus status, Long uptimeSec, Integer rssi) {
         this.status = status;
         this.uptimeSec = uptimeSec;
         this.rssi = rssi;
