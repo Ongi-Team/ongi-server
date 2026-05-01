@@ -44,8 +44,6 @@ public class AuthCommandService {
         Member member = memberQueryService.findByLoginIdWithElders(request.loginId());
         memberQueryService.validatePassword(member, request.password());
 
-        TokenPair tokens = tokenCommandService.issueTokens(member.getId(), request.loginMode());
-
         if (request.loginMode() == LoginMode.GUARDIAN) {
             memberCommandService.updateFcmToken(member, request.fcmToken(), request.osType());
         } else {
@@ -55,6 +53,7 @@ public class AuthCommandService {
             elderCommandService.updateFcmToken(elder, request.fcmToken(),request.osType());
         }
 
+        TokenPair tokens = tokenCommandService.issueTokens(member.getId(), request.loginMode());
         return LoginResponse.of(tokens.accessToken(), tokens.refreshToken(), request.loginMode(), member);
     }
 
