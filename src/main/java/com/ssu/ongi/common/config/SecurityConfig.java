@@ -45,7 +45,8 @@ public class SecurityConfig {
     };
 
     private static final String[] HEALTH_URIS = {
-            "/actuator/health"
+            "/actuator/health",
+            "/api/health"
     };
 
     private static final String[] DEVICE_URIS = {
