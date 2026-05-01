@@ -41,6 +41,7 @@ public class MemberCommandService {
     }
 
     public void updateFcmToken(Member member, String fcmToken, OsType osType) {
+        clearDuplicateFcmToken(member.getId(), fcmToken);
         member.updateFcmToken(fcmToken, osType);
     }
 

@@ -15,8 +15,8 @@ import com.ssu.ongi.domain.member.dto.request.SignupRequest;
 import com.ssu.ongi.domain.member.dto.request.UpdatePasswordRequest;
 import com.ssu.ongi.domain.auth.dto.response.CheckIdResponse;
 import com.ssu.ongi.domain.auth.dto.response.FindIdResponse;
+import com.ssu.ongi.common.jwt.MemberPrincipal;
 import com.ssu.ongi.domain.auth.dto.response.LoginResponse;
-import com.ssu.ongi.domain.member.enums.LoginMode;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -69,19 +69,18 @@ public class AuthController implements AuthControllerDocs {
     @Override
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<Void>> logout(
-            @AuthenticationPrincipal Long memberId,
-            @RequestParam LoginMode loginMode
+            @AuthenticationPrincipal MemberPrincipal principal
     ) {
-        authCommandService.logout(memberId, loginMode);
+        authCommandService.logout(principal.memberId(), principal.loginMode());
         return ApiResponse.success(SuccessStatus.LOGOUT_SUCCESS);
     }
 
     @Override
     @DeleteMapping("/withdraw")
     public ResponseEntity<ApiResponse<Void>> withdraw(
-            @AuthenticationPrincipal Long memberId
+            @AuthenticationPrincipal MemberPrincipal principal
     ) {
-        authCommandService.withdraw(memberId);
+        authCommandService.withdraw(principal.memberId());
         return ApiResponse.success(SuccessStatus.WITHDRAW_SUCCESS);
     }
 

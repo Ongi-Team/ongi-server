@@ -1,5 +1,6 @@
 package com.ssu.ongi.domain.medicine.controller;
 
+import com.ssu.ongi.common.jwt.MemberPrincipal;
 import com.ssu.ongi.common.response.ApiResponse;
 import com.ssu.ongi.common.status.SuccessStatus;
 import com.ssu.ongi.domain.medicine.dto.request.RegisterMedicineScheduleRequest;
@@ -32,20 +33,20 @@ public class MedicineScheduleController implements MedicineScheduleControllerDoc
     @Override
     @PostMapping
     public ResponseEntity<ApiResponse<Void>> saveSchedules(
-            @AuthenticationPrincipal Long memberId,
+            @AuthenticationPrincipal MemberPrincipal principal,
             @Valid @RequestBody RegisterMedicineScheduleRequest request
     ) {
-        medicineScheduleCommandService.saveSchedules(memberId, request);
+        medicineScheduleCommandService.saveSchedules(principal.memberId(), request);
         return ApiResponse.success(SuccessStatus.REGISTER_MEDICINE_SCHEDULE_SUCCESS);
     }
 
     @Override
     @GetMapping
     public ResponseEntity<ApiResponse<List<MedicineScheduleResponse>>> getSchedules(
-            @AuthenticationPrincipal Long memberId,
+            @AuthenticationPrincipal MemberPrincipal principal,
             @RequestParam Long elderId
     ) {
-        List<MedicineScheduleResponse> response = medicineScheduleQueryService.getSchedules(memberId, elderId);
+        List<MedicineScheduleResponse> response = medicineScheduleQueryService.getSchedules(principal.memberId(), elderId);
         return ApiResponse.success(SuccessStatus.GET_MEDICINE_SCHEDULE_SUCCESS, response);
     }
 

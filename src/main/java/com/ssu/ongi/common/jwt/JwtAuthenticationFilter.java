@@ -43,9 +43,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         try {
-            Long memberId = jwtTokenProvider.getMemberId(token);
+            MemberPrincipal principal = new MemberPrincipal(
+                    jwtTokenProvider.getMemberId(token),
+                    jwtTokenProvider.getLoginMode(token)
+            );
             UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(memberId, null, Collections.emptyList());
+                    new UsernamePasswordAuthenticationToken(principal, null, Collections.emptyList());
             SecurityContextHolder.getContext().setAuthentication(authentication);
             filterChain.doFilter(request, response);
 

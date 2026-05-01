@@ -1,5 +1,6 @@
 package com.ssu.ongi.domain.member.controller;
 
+import com.ssu.ongi.common.jwt.MemberPrincipal;
 import com.ssu.ongi.common.response.ApiResponse;
 import com.ssu.ongi.common.status.SuccessStatus;
 import com.ssu.ongi.domain.member.dto.request.FcmTokenRequest;
@@ -24,19 +25,19 @@ public class MemberController implements MemberControllerDocs {
     @Override
     @PostMapping("/fcm-token")
     public ResponseEntity<ApiResponse<Void>> registerFcmToken(
-            @AuthenticationPrincipal Long memberId,
+            @AuthenticationPrincipal MemberPrincipal principal,
             @Valid @RequestBody FcmTokenRequest request
     ) {
-        memberCommandService.registerFcmToken(memberId, request);
+        memberCommandService.registerFcmToken(principal.memberId(), request);
         return ApiResponse.success(SuccessStatus.FCM_TOKEN_REGISTER_SUCCESS);
     }
 
     @Override
     @DeleteMapping("/fcm-token")
     public ResponseEntity<ApiResponse<Void>> deleteFcmToken(
-            @AuthenticationPrincipal Long memberId
+            @AuthenticationPrincipal MemberPrincipal principal
     ) {
-        memberCommandService.deleteFcmToken(memberId);
+        memberCommandService.deleteFcmToken(principal.memberId());
         return ApiResponse.success(SuccessStatus.FCM_TOKEN_DELETE_SUCCESS);
     }
 }

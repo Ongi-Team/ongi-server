@@ -11,8 +11,8 @@ import com.ssu.ongi.domain.member.dto.request.SignupRequest;
 import com.ssu.ongi.domain.member.dto.request.UpdatePasswordRequest;
 import com.ssu.ongi.domain.auth.dto.response.CheckIdResponse;
 import com.ssu.ongi.domain.auth.dto.response.FindIdResponse;
+import com.ssu.ongi.common.jwt.MemberPrincipal;
 import com.ssu.ongi.domain.auth.dto.response.LoginResponse;
-import com.ssu.ongi.domain.member.enums.LoginMode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -213,7 +213,7 @@ public interface AuthControllerDocs {
                                     """))
             )
     })
-    ResponseEntity<ApiResponse<Void>> logout(Long memberId, @RequestParam LoginMode loginMode);
+    ResponseEntity<ApiResponse<Void>> logout(MemberPrincipal principal);
 
 
     @Operation(summary = "회원탈퇴", description = "계정을 soft delete 처리하고 RefreshToken 및 FCM 토큰을 삭제합니다.")
@@ -243,7 +243,7 @@ public interface AuthControllerDocs {
                                     """))
             )
     })
-    ResponseEntity<ApiResponse<Void>> withdraw(Long memberId);
+    ResponseEntity<ApiResponse<Void>> withdraw(MemberPrincipal principal);
 
 
     @Operation(summary = "아이디 찾기", description = "전화번호로 아이디를 조회합니다.")

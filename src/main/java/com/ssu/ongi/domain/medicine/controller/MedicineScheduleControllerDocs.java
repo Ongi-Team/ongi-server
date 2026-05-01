@@ -1,5 +1,6 @@
 package com.ssu.ongi.domain.medicine.controller;
 
+import com.ssu.ongi.common.jwt.MemberPrincipal;
 import com.ssu.ongi.common.response.ApiResponse;
 import com.ssu.ongi.domain.medicine.dto.request.RegisterMedicineScheduleRequest;
 import com.ssu.ongi.domain.medicine.dto.response.MedicineScheduleResponse;
@@ -71,7 +72,7 @@ public interface MedicineScheduleControllerDocs {
             )
     })
     ResponseEntity<ApiResponse<Void>> saveSchedules(
-            @AuthenticationPrincipal Long memberId,
+            @AuthenticationPrincipal MemberPrincipal principal,
             @Valid @RequestBody RegisterMedicineScheduleRequest request
     );
 
@@ -95,7 +96,7 @@ public interface MedicineScheduleControllerDocs {
             )
     })
     ResponseEntity<ApiResponse<List<MedicineScheduleResponse>>> getSchedules(
-            @AuthenticationPrincipal Long memberId,
+            @AuthenticationPrincipal MemberPrincipal principal,
             @Parameter(description = "어르신 ID", required = true, example = "1")
             @RequestParam Long elderId
     );
