@@ -71,5 +71,6 @@ public class Elder extends BaseEntity {
 
     public void deleteFcmToken() {
         this.fcmToken = null;
+        this.osType = null;
     }
 }

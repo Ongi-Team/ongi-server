@@ -27,6 +27,7 @@ public enum ErrorStatus implements BaseStatus {
     INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "AUTH_401", "아이디 또는 비밀번호가 올바르지 않습니다."),
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "AUTH_404", "회원을 찾을 수 없습니다."),
     ELDER_NOT_FOUND(HttpStatus.NOT_FOUND, "AUTH_404", "어르신 정보를 찾을 수 없습니다."),
+    ELDER_CANNOT_LOGOUT(HttpStatus.FORBIDDEN, "AUTH_403", "어르신 모드에서는 로그아웃이 불가능합니다."),
 
     /**
      * JWT

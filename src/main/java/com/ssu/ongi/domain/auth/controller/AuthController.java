@@ -16,6 +16,7 @@ import com.ssu.ongi.domain.member.dto.request.UpdatePasswordRequest;
 import com.ssu.ongi.domain.auth.dto.response.CheckIdResponse;
 import com.ssu.ongi.domain.auth.dto.response.FindIdResponse;
 import com.ssu.ongi.domain.auth.dto.response.LoginResponse;
+import com.ssu.ongi.domain.member.enums.LoginMode;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -68,9 +69,10 @@ public class AuthController implements AuthControllerDocs {
     @Override
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<Void>> logout(
-            @AuthenticationPrincipal Long memberId
+            @AuthenticationPrincipal Long memberId,
+            @RequestParam LoginMode loginMode
     ) {
-        authCommandService.logout(memberId);
+        authCommandService.logout(memberId, loginMode);
         return ApiResponse.success(SuccessStatus.LOGOUT_SUCCESS);
     }
 
