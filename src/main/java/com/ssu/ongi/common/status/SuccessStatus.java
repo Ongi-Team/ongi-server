@@ -41,7 +41,12 @@ public enum SuccessStatus implements BaseStatus {
      * Member
      */
     FCM_TOKEN_REGISTER_SUCCESS(HttpStatus.OK, "MEMBER_200", "FCM 토큰이 등록되었습니다."),
-    FCM_TOKEN_DELETE_SUCCESS(HttpStatus.OK, "MEMBER_200", "FCM 토큰이 삭제되었습니다.");
+    FCM_TOKEN_DELETE_SUCCESS(HttpStatus.OK, "MEMBER_200", "FCM 토큰이 삭제되었습니다."),
+
+    /**
+     * Device
+     */
+    DEVICE_CONNECTION_SUCCESS(HttpStatus.OK, "DEVICE_200", "디바이스가 연결되었습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;
