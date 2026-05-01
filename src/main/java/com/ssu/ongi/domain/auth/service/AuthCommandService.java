@@ -1,7 +1,9 @@
 package com.ssu.ongi.domain.auth.service;
 
+import com.ssu.ongi.common.exception.GeneralException;
 import com.ssu.ongi.common.jwt.TokenCommandService;
 import com.ssu.ongi.common.jwt.TokenPair;
+import com.ssu.ongi.common.status.ErrorStatus;
 import com.ssu.ongi.domain.auth.dto.response.ReissueResponse;
 import com.ssu.ongi.domain.elder.entity.Elder;
 import com.ssu.ongi.domain.elder.service.ElderCommandService;
@@ -11,6 +13,7 @@ import com.ssu.ongi.domain.member.dto.request.SignupRequest;
 import com.ssu.ongi.domain.member.dto.request.UpdatePasswordRequest;
 import com.ssu.ongi.domain.auth.dto.response.LoginResponse;
 import com.ssu.ongi.domain.member.entity.Member;
+import com.ssu.ongi.domain.member.enums.LoginMode;
 import com.ssu.ongi.domain.member.service.MemberCommandService;
 import com.ssu.ongi.domain.member.service.MemberQueryService;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +45,16 @@ public class AuthCommandService {
         memberQueryService.validatePassword(member, request.password());
 
         TokenPair tokens = tokenCommandService.issueTokens(member.getId(), request.loginMode());
+
+        if (request.loginMode() == LoginMode.GUARDIAN) {
+            memberCommandService.updateFcmToken(member, request.fcmToken(), request.osType());
+        } else {
+            Elder elder = member.getElders().stream()
+                    .findFirst()
+                    .orElseThrow(() -> new GeneralException(ErrorStatus.ELDER_NOT_FOUND));
+            elderCommandService.updateFcmToken(elder, request.fcmToken(),request.osType());
+        }
+
         return LoginResponse.of(tokens.accessToken(), tokens.refreshToken(), request.loginMode(), member);
     }
 
