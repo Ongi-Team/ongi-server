@@ -6,6 +6,8 @@ import com.ssu.ongi.domain.device.dto.request.DeviceRegisterRequest;
 import com.ssu.ongi.domain.device.dto.request.HeartbeatRequest;
 import com.ssu.ongi.domain.device.dto.response.RegisterDeviceResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -65,6 +67,12 @@ public interface DeviceControllerDocs {
     );
 
     @Operation(summary = "디바이스 heartbeat", description = "디바이스의 연결 상태를 업데이트합니다.")
+    @Parameter(
+            name = "Device-Token",
+            in = ParameterIn.HEADER,
+            required = true,
+            description = "디바이스 인증 토큰"
+    )
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "200",
@@ -104,7 +112,7 @@ public interface DeviceControllerDocs {
             )
     })
     ResponseEntity<ApiResponse<Void>> heartbeat(
-            @RequestAttribute Long deviceId,
+            @Parameter(hidden = true) @RequestAttribute Long deviceId,
             @Valid @RequestBody HeartbeatRequest request
     );
 }
