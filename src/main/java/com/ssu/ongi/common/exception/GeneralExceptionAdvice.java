@@ -4,6 +4,7 @@ import com.ssu.ongi.common.base.BaseStatus;
 import com.ssu.ongi.common.response.ApiResponse;
 import com.ssu.ongi.common.status.ErrorStatus;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +28,14 @@ public class GeneralExceptionAdvice extends ResponseEntityExceptionHandler {
             log.error("[*] GeneralException : {}", e.getMessage());
         }
         return ApiResponse.error(e.getErrorStatus());
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ApiResponse<Void>> handleDataIntegrityViolationException(
+            DataIntegrityViolationException e
+    ) {
+        log.error("[*] DataIntegrityViolationException : {}", e.getMessage());
+        return ApiResponse.error(ErrorStatus.DUPLICATE_CONSTRAINT);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

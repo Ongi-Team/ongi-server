@@ -19,4 +19,9 @@ public class ElderQueryService {
         return elderQueryRepository.findByIdAndMemberId(elderId, memberId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.ELDER_NOT_FOUND));
     }
+
+    public Elder getElderByMemberId(Long memberId) {
+        return elderQueryRepository.findFirstByMemberId(memberId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.ELDER_NOT_FOUND));
+    }
 }

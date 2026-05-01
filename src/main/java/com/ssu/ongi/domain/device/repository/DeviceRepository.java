@@ -7,4 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface DeviceRepository extends JpaRepository<Device, Long> {
 	Optional<Device> findBySerialNumber(String serialNumber);
+
+	boolean existsByElderIdAndSerialNumber(Long elderId, String serialNumber);
 }

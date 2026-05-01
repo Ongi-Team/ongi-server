@@ -7,4 +7,6 @@ import java.util.Optional;
 
 public interface ElderQueryRepository extends Repository<Elder, Long> {
     Optional<Elder> findByIdAndMemberId(Long elderId, Long memberId);
+
+    Optional<Elder> findFirstByMemberId(Long memberId);
 }
