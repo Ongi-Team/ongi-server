@@ -1,6 +1,9 @@
 package com.ssu.ongi.domain.device.entity;
 
+import java.time.LocalDateTime;
+
 import com.ssu.ongi.common.base.BaseEntity;
+import com.ssu.ongi.domain.device.enums.DeviceStatus;
 import com.ssu.ongi.domain.elder.entity.Elder;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -26,6 +29,13 @@ public class Device extends BaseEntity {
     @Column(nullable = false)
     private String serialNumber;
 
+    // Heartbeat
+    private DeviceStatus status; // ONLINE
+    private Long uptimeSec; // 부팅 후 경과 시간
+    private Integer rssi; // measures the power of a received radio signal
+    // private String firmwareVersion;
+    private LocalDateTime lastSeenAt;
+
     @Builder
     private Device(Elder elder, String serialNumber) {
         this.elder = elder;
@@ -37,5 +47,12 @@ public class Device extends BaseEntity {
                 .elder(elder)
                 .serialNumber(serialNumber)
                 .build();
+    }
+
+    public void updateHeartbeat(DeviceStatus status, Long uptimeSec, Integer rssi){
+        this.status = status;
+        this.uptimeSec = uptimeSec;
+        this.rssi = rssi;
+        this.lastSeenAt = LocalDateTime.now();
     }
 }
