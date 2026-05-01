@@ -49,3 +49,7 @@ application-test.yml
 
 ### firebase
 src/main/resources/firebase/
+
+### 기능명세서 관련
+기능명세서.md
+기능명세서.pdf
