@@ -1,5 +1,6 @@
 package com.ssu.ongi.common.config;
 
+import com.ssu.ongi.common.filter.DeviceAuthFilter;
 import com.ssu.ongi.common.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -24,6 +25,7 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final DeviceAuthFilter deviceAuthFilter;
 
     private static final String[] SWAGGER_URIS = {
             "/swagger-ui/**",
@@ -46,6 +48,10 @@ public class SecurityConfig {
             "/actuator/health"
     };
 
+    private static final String[] DEVICE_URIS = {
+            "/api/device/**"
+    };
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -56,9 +62,11 @@ public class SecurityConfig {
                         .requestMatchers(SWAGGER_URIS).permitAll()
                         .requestMatchers(AUTH_URIS).permitAll()
                         .requestMatchers(HEALTH_URIS).permitAll()
+                        .requestMatchers(DEVICE_URIS).permitAll()
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(deviceAuthFilter, JwtAuthenticationFilter.class);
 
         return http.build();
     }
@@ -87,7 +95,4 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
-
 }
-

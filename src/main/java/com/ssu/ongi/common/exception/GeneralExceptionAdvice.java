@@ -4,6 +4,8 @@ import com.ssu.ongi.common.base.BaseStatus;
 import com.ssu.ongi.common.response.ApiResponse;
 import com.ssu.ongi.common.status.ErrorStatus;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +29,34 @@ public class GeneralExceptionAdvice extends ResponseEntityExceptionHandler {
             log.error("[*] GeneralException : {}", e.getMessage());
         }
         return ApiResponse.error(e.getErrorStatus());
+    }
+
+    @ExceptionHandler(DuplicateKeyException.class)
+    public ResponseEntity<ApiResponse<Void>> handleDuplicateKeyException(
+            DuplicateKeyException e
+    ) {
+        log.error("[*] DuplicateKeyException : {}", e.getMessage());
+        return ApiResponse.error(ErrorStatus.DUPLICATE_CONSTRAINT);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ApiResponse<Void>> handleDataIntegrityViolationException(
+            DataIntegrityViolationException e
+    ) {
+        log.error("[*] DataIntegrityViolationException : {}", e.getMessage());
+        if (isDuplicateKeyViolation(e)) {
+            return ApiResponse.error(ErrorStatus.DUPLICATE_CONSTRAINT);
+        }
+        return ApiResponse.error(ErrorStatus.BAD_REQUEST);
+    }
+
+    private boolean isDuplicateKeyViolation(DataIntegrityViolationException e) {
+        Throwable cause = e.getCause();
+        if (cause == null) {
+            return false;
+        }
+        String message = cause.getMessage();
+        return message != null && message.toLowerCase().contains("duplicate");
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
@@ -81,5 +111,4 @@ public class GeneralExceptionAdvice extends ResponseEntityExceptionHandler {
                 null
         );
     }
-
 }

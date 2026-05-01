@@ -19,6 +19,7 @@ public enum ErrorStatus implements BaseStatus {
     NOT_FOUND(HttpStatus.NOT_FOUND, "COMMON_404", "요청한 자원을 찾을 수 없습니다."),
     METHOD_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED, "COMMON_405", "허용되지 않은 메소드입니다."),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "COMMON_500", "서버 내부 오류입니다."),
+    DUPLICATE_CONSTRAINT(HttpStatus.CONFLICT, "COMMON_409", "이미 존재하는 데이터입니다."),
 
     /**
      * Auth
@@ -29,9 +30,6 @@ public enum ErrorStatus implements BaseStatus {
     ELDER_NOT_FOUND(HttpStatus.NOT_FOUND, "AUTH_404", "어르신 정보를 찾을 수 없습니다."),
     ELDER_CANNOT_LOGOUT(HttpStatus.FORBIDDEN, "AUTH_403", "어르신 모드에서는 로그아웃이 불가능합니다."),
 
-    /**
-     * JWT
-     */
     /**
      * Phone Verification
      */
@@ -58,7 +56,8 @@ public enum ErrorStatus implements BaseStatus {
     /**
      * Device
      */
-    DEVICE_NOT_FOUND(HttpStatus.NOT_FOUND, "DEVICE_404", "디바이스를 찾을 수 없습니다.");
+    DEVICE_NOT_FOUND(HttpStatus.NOT_FOUND, "DEVICE_404", "디바이스를 찾을 수 없습니다."),
+    ELDER_CANNOT_REGISTER_DEVICE(HttpStatus.FORBIDDEN, "DEVICE_403", "어르신 모드에서는 디바이스 등록이 불가능합니다.");
 
     private final HttpStatus httpStatus;
     private final String code;

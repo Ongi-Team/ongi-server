@@ -46,7 +46,8 @@ public enum SuccessStatus implements BaseStatus {
     /**
      * Device
      */
-    DEVICE_CONNECTION_SUCCESS(HttpStatus.OK, "DEVICE_200", "디바이스가 연결되었습니다.");
+    DEVICE_CONNECTION_SUCCESS(HttpStatus.OK, "DEVICE_200", "디바이스가 연결되었습니다."),
+    DEVICE_REGISTER_SUCCESS(HttpStatus.CREATED, "DEVICE_201", "디바이스가 등록되었습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;
