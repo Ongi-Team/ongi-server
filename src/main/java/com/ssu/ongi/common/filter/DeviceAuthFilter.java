@@ -15,6 +15,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -24,6 +25,11 @@ public class DeviceAuthFilter extends OncePerRequestFilter {
     private final ObjectMapper objectMapper;
 
     private static final String DEVICE_TOKEN_HEADER = "Device-Token";
+
+    // ESP32 전용 경로 — Device-Token 헤더로 인증
+    private static final List<String> DEVICE_ONLY_PATHS = List.of(
+            "/api/device/heartbeat"
+    );
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -52,7 +58,7 @@ public class DeviceAuthFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
-        return !path.startsWith("/api/device/");
+        return DEVICE_ONLY_PATHS.stream().noneMatch(path::equals);
     }
 
     private void sendErrorResponse(HttpServletResponse response, ErrorStatus errorStatus) throws IOException {

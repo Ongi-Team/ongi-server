@@ -11,12 +11,14 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 
+@Tag(name = "Device", description = "기기 API")
 public interface DeviceControllerDocs {
 
     @Operation(summary = "디바이스 등록", description = "보호자가 어르신의 디바이스를 등록합니다.")
@@ -114,5 +116,48 @@ public interface DeviceControllerDocs {
     ResponseEntity<ApiResponse<Void>> heartbeat(
             @Parameter(hidden = true) @RequestAttribute Long deviceId,
             @Valid @RequestBody HeartbeatRequest request
+    );
+
+    @Operation(summary = "전체 약통 열기", description = "보호자가 전체 약통 열기 명령을 디바이스에 전달합니다.")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "명령 전달 성공",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                                    {
+                                        "isSuccess": true,
+                                        "code": "DEVICE_200",
+                                        "message": "전체 약통 열기 명령을 전달했습니다."
+                                    }
+                                    """))
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "403",
+                    description = "어르신 모드 접근 불가",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                                    {
+                                        "isSuccess": false,
+                                        "code": "DEVICE_403",
+                                        "message": "어르신 모드에서는 디바이스 등록이 불가능합니다."
+                                    }
+                                    """))
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "404",
+                    description = "등록된 디바이스 없음",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                                    {
+                                        "isSuccess": false,
+                                        "code": "DEVICE_404",
+                                        "message": "디바이스를 찾을 수 없습니다."
+                                    }
+                                    """))
+            )
+    })
+    ResponseEntity<ApiResponse<Void>> openAll(
+            @AuthenticationPrincipal MemberPrincipal principal
     );
 }

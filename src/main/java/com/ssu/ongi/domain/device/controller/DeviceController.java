@@ -45,4 +45,13 @@ public class DeviceController implements DeviceControllerDocs {
         deviceCommandService.updateHeartbeat(deviceId, request);
         return ApiResponse.success(SuccessStatus.DEVICE_CONNECTION_SUCCESS);
     }
+
+    @Override
+    @PostMapping("/open-all")
+    public ResponseEntity<ApiResponse<Void>> openAll(
+            @AuthenticationPrincipal MemberPrincipal principal
+    ) {
+        deviceCommandService.openAll(principal.memberId(), principal.loginMode());
+        return ApiResponse.success(SuccessStatus.DEVICE_OPEN_ALL_SUCCESS);
+    }
 }

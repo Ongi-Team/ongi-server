@@ -29,6 +29,7 @@ public enum ErrorStatus implements BaseStatus {
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "AUTH_404", "회원을 찾을 수 없습니다."),
     ELDER_NOT_FOUND(HttpStatus.NOT_FOUND, "AUTH_404", "어르신 정보를 찾을 수 없습니다."),
     ELDER_CANNOT_LOGOUT(HttpStatus.FORBIDDEN, "AUTH_403", "어르신 모드에서는 로그아웃이 불가능합니다."),
+    ELDER_CANNOT_ACCESS(HttpStatus.FORBIDDEN, "AUTH_403", "어르신 모드에서는 사용할 수 없는 기능입니다."),
 
     /**
      * Phone Verification
@@ -56,8 +57,7 @@ public enum ErrorStatus implements BaseStatus {
     /**
      * Device
      */
-    DEVICE_NOT_FOUND(HttpStatus.NOT_FOUND, "DEVICE_404", "디바이스를 찾을 수 없습니다."),
-    ELDER_CANNOT_REGISTER_DEVICE(HttpStatus.FORBIDDEN, "DEVICE_403", "어르신 모드에서는 디바이스 등록이 불가능합니다.");
+    DEVICE_NOT_FOUND(HttpStatus.NOT_FOUND, "DEVICE_404", "디바이스를 찾을 수 없습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;
