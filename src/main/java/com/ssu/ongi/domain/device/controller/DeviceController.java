@@ -54,4 +54,13 @@ public class DeviceController implements DeviceControllerDocs {
         deviceCommandService.openAll(principal.memberId(), principal.loginMode());
         return ApiResponse.success(SuccessStatus.DEVICE_OPEN_ALL_SUCCESS);
     }
+
+    @Override
+    @PostMapping("/close-all")
+    public ResponseEntity<ApiResponse<Void>> closeAll(
+            @AuthenticationPrincipal MemberPrincipal principal
+    ) {
+        deviceCommandService.closeAll(principal.memberId(), principal.loginMode());
+        return ApiResponse.success(SuccessStatus.DEVICE_CLOSE_ALL_SUCCESS);
+    }
 }
