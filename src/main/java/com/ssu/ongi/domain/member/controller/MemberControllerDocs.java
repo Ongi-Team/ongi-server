@@ -1,5 +1,6 @@
 package com.ssu.ongi.domain.member.controller;
 
+import com.ssu.ongi.common.jwt.MemberPrincipal;
 import com.ssu.ongi.common.response.ApiResponse;
 import com.ssu.ongi.domain.member.dto.request.FcmTokenRequest;
 import io.swagger.v3.oas.annotations.Operation;
@@ -54,7 +55,7 @@ public interface MemberControllerDocs {
             )
     })
     ResponseEntity<ApiResponse<Void>> registerFcmToken(
-            Long memberId,
+            MemberPrincipal principal,
             @Valid @RequestBody FcmTokenRequest request
     );
 
@@ -85,5 +86,5 @@ public interface MemberControllerDocs {
                                     """))
             )
     })
-    ResponseEntity<ApiResponse<Void>> deleteFcmToken(Long memberId);
+    ResponseEntity<ApiResponse<Void>> deleteFcmToken(MemberPrincipal principal);
 }

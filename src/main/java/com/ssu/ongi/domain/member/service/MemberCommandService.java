@@ -5,6 +5,7 @@ import com.ssu.ongi.common.status.ErrorStatus;
 import com.ssu.ongi.domain.member.dto.request.FcmTokenRequest;
 import com.ssu.ongi.domain.member.dto.request.SignupRequest;
 import com.ssu.ongi.domain.member.entity.Member;
+import com.ssu.ongi.domain.member.enums.OsType;
 import com.ssu.ongi.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -37,6 +38,11 @@ public class MemberCommandService {
 
     public void updatePassword(Member member, String newPassword) {
         member.updatePassword(passwordEncoder.encode(newPassword));
+    }
+
+    public void updateFcmToken(Member member, String fcmToken, OsType osType) {
+        clearDuplicateFcmToken(member.getId(), fcmToken);
+        member.updateFcmToken(fcmToken, osType);
     }
 
     public void registerFcmToken(Long memberId, FcmTokenRequest request) {
