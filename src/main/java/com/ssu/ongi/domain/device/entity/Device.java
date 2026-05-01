@@ -30,10 +30,17 @@ public class Device extends BaseEntity {
     private String serialNumber;
 
     // Heartbeat
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
     private DeviceStatus status; // ONLINE
+
+    @Column(name="uptimeSec")
     private Long uptimeSec; // 부팅 후 경과 시간
+
+    @Column(name = "rssi")
     private Integer rssi; // measures the power of a received radio signal
-    // private String firmwareVersion;
+
+    @Column(name="lastSeenAt")
     private LocalDateTime lastSeenAt;
 
     @Builder
