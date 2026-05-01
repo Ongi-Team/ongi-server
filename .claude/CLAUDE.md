@@ -177,3 +177,43 @@ The assistant should prioritize consistency with the existing codebase over intr
 - Do not access repositories directly from controllers.
 - Use authenticated user info from security context.
 - Keep transaction boundaries clear.
+
+---
+
+## Commit Message Rules
+
+- Use only the following types:
+  - feat
+  - fix
+  - chore
+  - refactor
+  - deploy
+
+- Format:
+  - `<type>: <message>`
+
+- The message must be:
+  - Written in Korean
+  - A single short sentence
+  - Simple and clear
+
+- Type meanings:
+  - feat: 새로운 기능 추가
+  - fix: 에러 또는 버그 수정
+  - chore: 설정, 환경 구성, 기타 작업
+  - refactor: 코드 구조 개선 또는 리팩토링
+  - deploy: 배포 관련 작업
+
+- Writing rules:
+  - Do not write in English
+  - Do not use multiple lines
+  - Do not add bullet points
+  - Do not add detailed descriptions
+  - Keep it concise (one line only)
+
+- Examples:
+  - feat: 로그인 API 추가
+  - fix: 토큰 검증 오류 수정
+  - chore: Redis 설정 추가
+  - refactor: UserService 로직 개선
+  - deploy: 운영 서버 배포 설정 변경
