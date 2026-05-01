@@ -6,7 +6,7 @@ import jakarta.validation.constraints.PositiveOrZero;
 
 public record HeartbeatRequest(
         @NotNull DeviceStatus status,
-        @NotNull @PositiveOrZero Long uptimeSe,
+        @NotNull @PositiveOrZero Long uptimeSec,
         @NotNull Integer rssi
 ) {
 }
