@@ -1,23 +1,19 @@
 package com.ssu.ongi.domain.medicine.dto.response;
 
-import com.ssu.ongi.domain.medicine.entity.MedicineSchedule;
+import com.ssu.ongi.domain.medicine.entity.Medicine;
 
 import java.time.LocalTime;
 
 public record MedicineScheduleResponse(
-        Long scheduleId,
         Long medicineId,
         String name,
-        Integer dispenserSlot,
         LocalTime scheduledTime
 ) {
-    public static MedicineScheduleResponse from(MedicineSchedule schedule) {
+    public static MedicineScheduleResponse from(Medicine medicine) {
         return new MedicineScheduleResponse(
-                schedule.getId(),
-                schedule.getMedicine().getId(),
-                schedule.getMedicine().getName(),
-                schedule.getDispenserSlot(),
-                schedule.getScheduledTime()
+                medicine.getId(),
+                medicine.getName(),
+                medicine.getScheduledTime()
         );
     }
 }

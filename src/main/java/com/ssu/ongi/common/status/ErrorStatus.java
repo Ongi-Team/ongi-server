@@ -53,6 +53,7 @@ public enum ErrorStatus implements BaseStatus {
     MEDICINE_NOT_FOUND(HttpStatus.NOT_FOUND, "MEDICINE_404", "약 정보를 찾을 수 없습니다."),
     SCHEDULE_NOT_FOUND(HttpStatus.NOT_FOUND, "SCHEDULE_404", "복약 스케줄을 찾을 수 없습니다."),
     DUPLICATE_SCHEDULE_TIME(HttpStatus.CONFLICT, "SCHEDULE_409", "동일한 시간에 이미 스케줄이 존재합니다."),
+    DEVICE_SLOT_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "SCHEDULE_400", "슬롯은 최대 8개까지 등록 가능합니다."),
 
     /**
      * Device

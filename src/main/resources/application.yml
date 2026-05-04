@@ -5,4 +5,6 @@ spring:
   profiles:
     default: prod
 
-
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false

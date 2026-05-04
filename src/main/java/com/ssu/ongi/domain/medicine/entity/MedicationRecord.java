@@ -14,8 +14,8 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "medication_record",
         uniqueConstraints = @UniqueConstraint(
-                name = "uk_schedule_recorded_at",
-                columnNames = {"medicine_schedule_id", "recorded_at"}
+                name = "uk_medicine_recorded_at",
+                columnNames = {"medicine_id", "recorded_at"}
         ))
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -27,8 +27,8 @@ public class MedicationRecord extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "medicine_schedule_id", nullable = false)
-    private MedicineSchedule medicineSchedule;
+    @JoinColumn(name = "medicine_id", nullable = false)
+    private Medicine medicine;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "device_id", nullable = false)
@@ -42,18 +42,18 @@ public class MedicationRecord extends BaseEntity {
     private LocalDateTime recordedAt;
 
     @Builder
-    private MedicationRecord(MedicineSchedule medicineSchedule, Device device,
+    private MedicationRecord(Medicine medicine, Device device,
                              MedicationResult result, LocalDateTime recordedAt) {
-        this.medicineSchedule = medicineSchedule;
+        this.medicine = medicine;
         this.device = device;
         this.result = result;
         this.recordedAt = recordedAt;
     }
 
-    public static MedicationRecord create(MedicineSchedule medicineSchedule, Device device,
+    public static MedicationRecord create(Medicine medicine, Device device,
                                           MedicationResult result, LocalDateTime recordedAt) {
         return MedicationRecord.builder()
-                .medicineSchedule(medicineSchedule)
+                .medicine(medicine)
                 .device(device)
                 .result(result)
                 .recordedAt(recordedAt)
