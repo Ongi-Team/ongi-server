@@ -33,7 +33,6 @@ if ! docker ps | grep -q ongi-mqtt; then
   echo "MQTT 컨테이너가 실행 중이 아닙니다. MQTT를 먼저 실행합니다."
 
   mkdir -p /home/ubuntu/mosquitto/config
-
   cat > /home/ubuntu/mosquitto/config/mosquitto.conf << 'EOF'
 listener 1883
 allow_anonymous true
@@ -116,8 +115,8 @@ echo "nginx 전환 완료"
 
 # 11. 기존 컨테이너 종료
 echo "기존 컨테이너 종료 (${CURRENT_PORT})"
-docker stop ongi-backend-${CURRENT_PORT} 2>/dev/null || true
-docker rm ongi-backend-${CURRENT_PORT} 2>/dev/null || true
+docker stop "ongi-backend-${CURRENT_PORT}" 2>/dev/null || true
+docker rm "ongi-backend-${CURRENT_PORT}" 2>/dev/null || true
 
 # 12. 이전 이미지 삭제 + 전체 미사용 리소스 정리
 echo "Docker 리소스 정리 중..."
