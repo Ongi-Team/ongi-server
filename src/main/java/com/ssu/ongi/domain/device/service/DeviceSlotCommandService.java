@@ -1,7 +1,10 @@
 package com.ssu.ongi.domain.device.service;
 
+import com.ssu.ongi.common.exception.GeneralException;
+import com.ssu.ongi.common.status.ErrorStatus;
 import com.ssu.ongi.domain.device.entity.Device;
 import com.ssu.ongi.domain.device.entity.DeviceSlot;
+import com.ssu.ongi.domain.device.enums.SlotStatus;
 import com.ssu.ongi.domain.device.repository.DeviceSlotRepository;
 import com.ssu.ongi.domain.elder.entity.Elder;
 import com.ssu.ongi.domain.medicine.entity.Medicine;
@@ -43,6 +46,15 @@ public class DeviceSlotCommandService {
             slots.add(DeviceSlot.create(elder, device, sortedMedicines.get(i), i + 1));
         }
         deviceSlotRepository.saveAll(slots);
+    }
+
+    /**
+     * 디바이스 ID와 슬롯 번호로 해당 슬롯의 복약 상태를 업데이트합니다.
+     */
+    public void updateMedicationStatus(Long deviceId, Integer slotNumber, SlotStatus status) {
+        DeviceSlot deviceSlot = deviceSlotRepository.findByDeviceIdAndSlotNumber(deviceId, slotNumber)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.DEVICE_SLOT_NOT_FOUND));
+        deviceSlot.updateStatus(status);
     }
 
     /**

@@ -6,6 +6,7 @@ import com.ssu.ongi.common.mqtt.MqttPublisher;
 import com.ssu.ongi.common.status.ErrorStatus;
 import com.ssu.ongi.domain.device.dto.request.DeviceRegisterRequest;
 import com.ssu.ongi.domain.device.dto.request.HeartbeatRequest;
+import com.ssu.ongi.domain.device.dto.request.MedicationStatusRequest;
 import com.ssu.ongi.domain.device.dto.response.RegisterDeviceResponse;
 import com.ssu.ongi.domain.device.entity.Device;
 import com.ssu.ongi.domain.device.repository.DeviceRepository;
@@ -26,6 +27,7 @@ public class DeviceCommandService {
     private final DeviceRepository deviceRepository;
     private final ElderQueryService elderQueryService;
     private final MqttPublisher mqttPublisher;
+    private final DeviceSlotCommandService deviceSlotCommandService;
 
     /**
      * 보호자의 어르신에게 디바이스를 등록하고 deviceToken을 발급합니다.
@@ -62,6 +64,14 @@ public class DeviceCommandService {
     public void closeAll(Long memberId, LoginMode loginMode) {
         Device device = getGuardianDevice(memberId, loginMode);
         mqttPublisher.publish(DeviceTopic.closeAll(device.getDeviceToken()), "CLOSE_ALL");
+    }
+
+    /**
+     * 디바이스로부터 복약 상태를 수신하여 슬롯 상태를 업데이트합니다.
+     */
+    public void updateMedicationStatus(Long deviceId, MedicationStatusRequest request) {
+        deviceSlotCommandService.updateMedicationStatus(deviceId, request.slotNumber(), request.status());
+        // TODO FCM 알림 전송 추가
     }
 
     /**

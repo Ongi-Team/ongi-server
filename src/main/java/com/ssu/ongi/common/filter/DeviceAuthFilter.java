@@ -28,7 +28,8 @@ public class DeviceAuthFilter extends OncePerRequestFilter {
 
     // ESP32 전용 경로 — Device-Token 헤더로 인증
     private static final List<String> DEVICE_ONLY_PATHS = List.of(
-            "/api/device/heartbeat"
+            "/api/device/heartbeat",
+            "/api/device/medication-status"
     );
 
     @Override

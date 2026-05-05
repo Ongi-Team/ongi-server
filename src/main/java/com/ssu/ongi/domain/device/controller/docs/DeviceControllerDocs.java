@@ -4,6 +4,7 @@ import com.ssu.ongi.common.jwt.MemberPrincipal;
 import com.ssu.ongi.common.response.ApiResponse;
 import com.ssu.ongi.domain.device.dto.request.DeviceRegisterRequest;
 import com.ssu.ongi.domain.device.dto.request.HeartbeatRequest;
+import com.ssu.ongi.domain.device.dto.request.MedicationStatusRequest;
 import com.ssu.ongi.domain.device.dto.response.RegisterDeviceResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -23,45 +24,18 @@ public interface DeviceControllerDocs {
 
     @Operation(summary = "디바이스 등록", description = "보호자가 어르신의 디바이스를 등록합니다.")
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "201",
-                    description = "디바이스 등록 성공",
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "디바이스 등록 성공",
                     content = @Content(mediaType = "application/json",
                             examples = @ExampleObject(value = """
                                     {
                                         "isSuccess": true,
                                         "code": "DEVICE_201",
                                         "message": "디바이스가 등록되었습니다.",
-                                        "data": {
-                                            "deviceToken": "550e8400-e29b-41d4-a716-446655440000"
-                                        }
+                                        "data": { "deviceToken": "550e8400-e29b-41d4-a716-446655440000" }
                                     }
-                                    """))
-            ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "403",
-                    description = "어르신 모드 접근 불가",
-                    content = @Content(mediaType = "application/json",
-                            examples = @ExampleObject(value = """
-                                    {
-                                        "isSuccess": false,
-                                        "code": "AUTH_403",
-                                        "message": "어르신 모드에서는 사용할 수 없는 기능입니다."
-                                    }
-                                    """))
-            ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "409",
-                    description = "이미 등록된 디바이스",
-                    content = @Content(mediaType = "application/json",
-                            examples = @ExampleObject(value = """
-                                    {
-                                        "isSuccess": false,
-                                        "code": "COMMON_409",
-                                        "message": "이미 존재하는 데이터입니다."
-                                    }
-                                    """))
-            )
+                                    """))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "어르신 모드 접근 불가"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "409", description = "이미 등록된 디바이스")
     })
     ResponseEntity<ApiResponse<RegisterDeviceResponse>> registerDevice(
             @AuthenticationPrincipal MemberPrincipal principal,
@@ -69,49 +43,11 @@ public interface DeviceControllerDocs {
     );
 
     @Operation(summary = "디바이스 heartbeat", description = "디바이스의 연결 상태를 업데이트합니다.")
-    @Parameter(
-            name = "Device-Token",
-            in = ParameterIn.HEADER,
-            required = true,
-            description = "디바이스 인증 토큰"
-    )
+    @Parameter(name = "Device-Token", in = ParameterIn.HEADER, required = true, description = "디바이스 인증 토큰")
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "200",
-                    description = "heartbeat 수신 성공",
-                    content = @Content(mediaType = "application/json",
-                            examples = @ExampleObject(value = """
-                                    {
-                                        "isSuccess": true,
-                                        "code": "DEVICE_200",
-                                        "message": "디바이스가 연결되었습니다."
-                                    }
-                                    """))
-            ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "401",
-                    description = "Device-Token 없음",
-                    content = @Content(mediaType = "application/json",
-                            examples = @ExampleObject(value = """
-                                    {
-                                        "isSuccess": false,
-                                        "code": "COMMON_401",
-                                        "message": "인증이 필요합니다."
-                                    }
-                                    """))
-            ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "404",
-                    description = "등록되지 않은 디바이스 토큰",
-                    content = @Content(mediaType = "application/json",
-                            examples = @ExampleObject(value = """
-                                    {
-                                        "isSuccess": false,
-                                        "code": "DEVICE_404",
-                                        "message": "디바이스를 찾을 수 없습니다."
-                                    }
-                                    """))
-            )
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "heartbeat 수신 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "Device-Token 없음"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "등록되지 않은 디바이스 토큰")
     })
     ResponseEntity<ApiResponse<Void>> heartbeat(
             @Parameter(hidden = true) @RequestAttribute Long deviceId,
@@ -120,42 +56,9 @@ public interface DeviceControllerDocs {
 
     @Operation(summary = "전체 약통 열기", description = "보호자가 전체 약통 열기 명령을 디바이스에 전달합니다.")
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "200",
-                    description = "명령 전달 성공",
-                    content = @Content(mediaType = "application/json",
-                            examples = @ExampleObject(value = """
-                                    {
-                                        "isSuccess": true,
-                                        "code": "DEVICE_200",
-                                        "message": "전체 약통 열기 명령을 전달했습니다."
-                                    }
-                                    """))
-            ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "403",
-                    description = "어르신 모드 접근 불가",
-                    content = @Content(mediaType = "application/json",
-                            examples = @ExampleObject(value = """
-                                    {
-                                        "isSuccess": false,
-                                        "code": "AUTH_403",
-                                        "message": "어르신 모드에서는 사용할 수 없는 기능입니다."
-                                    }
-                                    """))
-            ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "404",
-                    description = "등록된 디바이스 없음",
-                    content = @Content(mediaType = "application/json",
-                            examples = @ExampleObject(value = """
-                                    {
-                                        "isSuccess": false,
-                                        "code": "DEVICE_404",
-                                        "message": "디바이스를 찾을 수 없습니다."
-                                    }
-                                    """))
-            )
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "명령 전달 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "어르신 모드 접근 불가"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "등록된 디바이스 없음")
     })
     ResponseEntity<ApiResponse<Void>> openAll(
             @AuthenticationPrincipal MemberPrincipal principal
@@ -163,44 +66,23 @@ public interface DeviceControllerDocs {
 
     @Operation(summary = "전체 약통 닫기", description = "보호자가 전체 약통 닫기 명령을 디바이스에 전달합니다.")
     @ApiResponses({
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "200",
-                    description = "명령 전달 성공",
-                    content = @Content(mediaType = "application/json",
-                            examples = @ExampleObject(value = """
-                                    {
-                                        "isSuccess": true,
-                                        "code": "DEVICE_200",
-                                        "message": "전체 약통 닫기 명령을 전달했습니다."
-                                    }
-                                    """))
-            ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "403",
-                    description = "어르신 모드 접근 불가",
-                    content = @Content(mediaType = "application/json",
-                            examples = @ExampleObject(value = """
-                                    {
-                                        "isSuccess": false,
-                                        "code": "AUTH_403",
-                                        "message": "어르신 모드에서는 사용할 수 없는 기능입니다."
-                                    }
-                                    """))
-            ),
-            @io.swagger.v3.oas.annotations.responses.ApiResponse(
-                    responseCode = "404",
-                    description = "등록된 디바이스 없음",
-                    content = @Content(mediaType = "application/json",
-                            examples = @ExampleObject(value = """
-                                    {
-                                        "isSuccess": false,
-                                        "code": "DEVICE_404",
-                                        "message": "디바이스를 찾을 수 없습니다."
-                                    }
-                                    """))
-            )
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "명령 전달 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "어르신 모드 접근 불가"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "등록된 디바이스 없음")
     })
     ResponseEntity<ApiResponse<Void>> closeAll(
             @AuthenticationPrincipal MemberPrincipal principal
+    );
+
+    @Operation(summary = "복약 상태 업데이트", description = "디바이스가 복약 완료/미복약 상태를 전송합니다.")
+    @Parameter(name = "Device-Token", in = ParameterIn.HEADER, required = true, description = "디바이스 인증 토큰")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "복약 상태 업데이트 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "Device-Token 없음"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "슬롯을 찾을 수 없음")
+    })
+    ResponseEntity<ApiResponse<Void>> updateMedicationStatus(
+            @Parameter(hidden = true) @RequestAttribute Long deviceId,
+            @Valid @RequestBody MedicationStatusRequest request
     );
 }

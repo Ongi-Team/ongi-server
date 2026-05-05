@@ -1,6 +1,7 @@
 package com.ssu.ongi.domain.device.entity;
 
 import com.ssu.ongi.common.base.BaseEntity;
+import com.ssu.ongi.domain.device.enums.SlotStatus;
 import com.ssu.ongi.domain.elder.entity.Elder;
 import com.ssu.ongi.domain.medicine.entity.Medicine;
 import jakarta.persistence.*;
@@ -35,6 +36,10 @@ public class DeviceSlot extends BaseEntity {
     @Column(nullable = false)
     private Integer slotNumber;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = true)
+    private SlotStatus status;
+
     @Builder
     private DeviceSlot(Elder elder, Device device, Medicine medicine, Integer slotNumber) {
         this.elder = elder;
@@ -54,5 +59,9 @@ public class DeviceSlot extends BaseEntity {
 
     public void updateSlotNumber(int slotNumber) {
         this.slotNumber = slotNumber;
+    }
+
+    public void updateStatus(SlotStatus status) {
+        this.status = status;
     }
 }

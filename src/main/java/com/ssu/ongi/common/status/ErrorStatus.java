@@ -58,7 +58,8 @@ public enum ErrorStatus implements BaseStatus {
     /**
      * Device
      */
-    DEVICE_NOT_FOUND(HttpStatus.NOT_FOUND, "DEVICE_404", "디바이스를 찾을 수 없습니다.");
+    DEVICE_NOT_FOUND(HttpStatus.NOT_FOUND, "DEVICE_404", "디바이스를 찾을 수 없습니다."),
+    DEVICE_SLOT_NOT_FOUND(HttpStatus.NOT_FOUND, "DEVICE_404", "디바이스 슬롯을 찾을 수 없습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;
