@@ -1,4 +1,4 @@
-package com.ssu.ongi.domain.device.controller;
+package com.ssu.ongi.domain.device.controller.docs;
 
 import com.ssu.ongi.common.jwt.MemberPrincipal;
 import com.ssu.ongi.common.response.ApiResponse;

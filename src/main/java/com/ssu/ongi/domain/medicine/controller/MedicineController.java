@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -44,10 +43,9 @@ public class MedicineController implements MedicineControllerDocs {
     @Override
     @GetMapping
     public ResponseEntity<ApiResponse<List<MedicineScheduleResponse>>> getSchedules(
-            @AuthenticationPrincipal MemberPrincipal principal,
-            @RequestParam Long elderId
+            @AuthenticationPrincipal MemberPrincipal principal
     ) {
-        List<MedicineScheduleResponse> response = medicineQueryService.getSchedules(principal.memberId(), elderId);
+        List<MedicineScheduleResponse> response = medicineQueryService.getSchedules(principal.memberId());
         return ApiResponse.success(SuccessStatus.GET_MEDICINE_SCHEDULE_SUCCESS, response);
     }
 

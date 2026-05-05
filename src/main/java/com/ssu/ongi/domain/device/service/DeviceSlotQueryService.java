@@ -9,6 +9,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -23,5 +27,17 @@ public class DeviceSlotQueryService {
         DeviceSlot deviceSlot = deviceSlotRepository.findByElderIdAndSlotNumber(elderId, slotNumber)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.SCHEDULE_NOT_FOUND));
         return deviceSlot.getMedicine();
+    }
+
+    /**
+     * elderId로 DeviceSlot 전체를 한 번에 조회하여 medicineId 기준 Map으로 반환합니다.
+     */
+    public Map<Long, DeviceSlot> getSlotMapByElderId(Long elderId) {
+        return deviceSlotRepository.findAllWithMedicineByElderId(elderId)
+                .stream()
+                .collect(Collectors.toMap(
+                        ds -> ds.getMedicine().getId(),
+                        ds -> ds
+                ));
     }
 }

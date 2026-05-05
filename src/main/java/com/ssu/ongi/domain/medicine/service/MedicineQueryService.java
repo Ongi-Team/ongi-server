@@ -1,9 +1,8 @@
 package com.ssu.ongi.domain.medicine.service;
 
-import com.ssu.ongi.common.exception.GeneralException;
-import com.ssu.ongi.common.status.ErrorStatus;
-import com.ssu.ongi.domain.elder.repository.ElderRepository;
-import com.ssu.ongi.domain.medicine.dto.response.LockTimeRangeResponse;
+import com.ssu.ongi.domain.device.entity.DeviceSlot;
+import com.ssu.ongi.domain.device.service.DeviceSlotQueryService;
+import com.ssu.ongi.domain.elder.service.ElderQueryService;
 import com.ssu.ongi.domain.medicine.dto.response.MedicineScheduleResponse;
 import com.ssu.ongi.domain.medicine.entity.Medicine;
 import com.ssu.ongi.domain.medicine.repository.MedicineRepository;
@@ -11,41 +10,29 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class MedicineQueryService {
 
-    private final ElderRepository elderRepository;
     private final MedicineRepository medicineRepository;
+    private final ElderQueryService elderQueryService;
+    private final DeviceSlotQueryService deviceSlotQueryService;
 
-    public List<MedicineScheduleResponse> getSchedules(Long memberId, Long elderId) {
-        elderRepository.findByIdAndMemberId(elderId, memberId)
-                .orElseThrow(() -> new GeneralException(ErrorStatus.ELDER_NOT_FOUND));
+    /**
+     * memberId로 elder를 조회하여 복약 스케줄과 슬롯 정보를 시간 오름차순으로 반환합니다.
+     */
+    public List<MedicineScheduleResponse> getSchedules(Long memberId) {
+        Long elderId = elderQueryService.getElderByMemberId(memberId).getId();
 
-        return medicineRepository.findAllByElderIdOrderByScheduledTimeAsc(elderId)
-                .stream()
-                .map(MedicineScheduleResponse::from)
+        List<Medicine> medicines = medicineRepository.findAllByElderIdOrderByScheduledTimeAsc(elderId);
+        Map<Long, DeviceSlot> slotMap = deviceSlotQueryService.getSlotMapByElderId(elderId);
+
+        return medicines.stream()
+                .map(medicine -> MedicineScheduleResponse.of(medicine, slotMap.get(medicine.getId())))
                 .toList();
-    }
-
-    public LockTimeRangeResponse calculateLockTimeRange(List<Medicine> medicines) {
-        if (medicines.isEmpty()) {
-            return null;
-        }
-
-        LocalTime earliest = medicines.get(0).getScheduledTime();
-        LocalTime latest = medicines.get(medicines.size() - 1).getScheduledTime();
-        LocalTime lockStart = safeMinusMinutes(earliest, 30);
-
-        return new LockTimeRangeResponse(lockStart, latest);
-    }
-
-    private LocalTime safeMinusMinutes(LocalTime time, int minutes) {
-        LocalTime result = time.minusMinutes(minutes);
-        return result.isAfter(time) ? LocalTime.MIN : result;
     }
 }
