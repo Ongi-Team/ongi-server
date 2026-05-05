@@ -3,10 +3,11 @@ package com.ssu.ongi.domain.medicine.controller;
 import com.ssu.ongi.common.jwt.MemberPrincipal;
 import com.ssu.ongi.common.response.ApiResponse;
 import com.ssu.ongi.common.status.SuccessStatus;
+import com.ssu.ongi.domain.medicine.controller.docs.MedicineControllerDocs;
 import com.ssu.ongi.domain.medicine.dto.request.RegisterMedicineScheduleRequest;
 import com.ssu.ongi.domain.medicine.dto.response.MedicineScheduleResponse;
-import com.ssu.ongi.domain.medicine.service.MedicineScheduleCommandService;
-import com.ssu.ongi.domain.medicine.service.MedicineScheduleQueryService;
+import com.ssu.ongi.domain.medicine.service.MedicineCommandService;
+import com.ssu.ongi.domain.medicine.service.MedicineQueryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +18,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -25,38 +25,37 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/medicine/schedules")
 @RequiredArgsConstructor
-public class MedicineScheduleController implements MedicineScheduleControllerDocs {
+public class MedicineController implements MedicineControllerDocs {
 
-    private final MedicineScheduleCommandService medicineScheduleCommandService;
-    private final MedicineScheduleQueryService medicineScheduleQueryService;
+    private final MedicineCommandService medicineCommandService;
+    private final MedicineQueryService medicineQueryService;
 
     @Override
     @PostMapping
-    public ResponseEntity<ApiResponse<Void>> saveSchedules(
+    public ResponseEntity<ApiResponse<Void>> registerSchedules(
             @AuthenticationPrincipal MemberPrincipal principal,
             @Valid @RequestBody RegisterMedicineScheduleRequest request
     ) {
-        medicineScheduleCommandService.saveSchedules(principal.memberId(), request);
+        medicineCommandService.registerSchedules(principal.memberId(), request);
         return ApiResponse.success(SuccessStatus.REGISTER_MEDICINE_SCHEDULE_SUCCESS);
     }
 
     @Override
     @GetMapping
     public ResponseEntity<ApiResponse<List<MedicineScheduleResponse>>> getSchedules(
-            @AuthenticationPrincipal MemberPrincipal principal,
-            @RequestParam Long elderId
+            @AuthenticationPrincipal MemberPrincipal principal
     ) {
-        List<MedicineScheduleResponse> response = medicineScheduleQueryService.getSchedules(principal.memberId(), elderId);
+        List<MedicineScheduleResponse> response = medicineQueryService.getSchedules(principal.memberId());
         return ApiResponse.success(SuccessStatus.GET_MEDICINE_SCHEDULE_SUCCESS, response);
     }
 
     @Override
-    @DeleteMapping("/{scheduleId}")
+    @DeleteMapping("/{medicineId}")
     public ResponseEntity<ApiResponse<Void>> deleteSchedule(
-            @PathVariable Long scheduleId,
-            @RequestParam Long elderId
+            @AuthenticationPrincipal MemberPrincipal principal,
+            @PathVariable Long medicineId
     ) {
-        medicineScheduleCommandService.deleteSchedule(scheduleId, elderId);
+        medicineCommandService.deleteSchedule(principal.memberId(), medicineId);
         return ApiResponse.success(SuccessStatus.DELETE_MEDICINE_SCHEDULE_SUCCESS);
     }
 }

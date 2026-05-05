@@ -29,6 +29,7 @@ public enum ErrorStatus implements BaseStatus {
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "AUTH_404", "회원을 찾을 수 없습니다."),
     ELDER_NOT_FOUND(HttpStatus.NOT_FOUND, "AUTH_404", "어르신 정보를 찾을 수 없습니다."),
     ELDER_CANNOT_LOGOUT(HttpStatus.FORBIDDEN, "AUTH_403", "어르신 모드에서는 로그아웃이 불가능합니다."),
+    ELDER_CANNOT_ACCESS(HttpStatus.FORBIDDEN, "AUTH_403", "어르신 모드에서는 사용할 수 없는 기능입니다."),
 
     /**
      * Phone Verification
@@ -52,12 +53,13 @@ public enum ErrorStatus implements BaseStatus {
     MEDICINE_NOT_FOUND(HttpStatus.NOT_FOUND, "MEDICINE_404", "약 정보를 찾을 수 없습니다."),
     SCHEDULE_NOT_FOUND(HttpStatus.NOT_FOUND, "SCHEDULE_404", "복약 스케줄을 찾을 수 없습니다."),
     DUPLICATE_SCHEDULE_TIME(HttpStatus.CONFLICT, "SCHEDULE_409", "동일한 시간에 이미 스케줄이 존재합니다."),
+    DEVICE_SLOT_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "SCHEDULE_400", "슬롯은 최대 8개까지 등록 가능합니다."),
 
     /**
      * Device
      */
     DEVICE_NOT_FOUND(HttpStatus.NOT_FOUND, "DEVICE_404", "디바이스를 찾을 수 없습니다."),
-    ELDER_CANNOT_REGISTER_DEVICE(HttpStatus.FORBIDDEN, "DEVICE_403", "어르신 모드에서는 디바이스 등록이 불가능합니다.");
+    DEVICE_SLOT_NOT_FOUND(HttpStatus.NOT_FOUND, "DEVICE_404", "디바이스 슬롯을 찾을 수 없습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;

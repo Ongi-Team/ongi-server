@@ -3,8 +3,10 @@ package com.ssu.ongi.domain.device.controller;
 import com.ssu.ongi.common.jwt.MemberPrincipal;
 import com.ssu.ongi.common.response.ApiResponse;
 import com.ssu.ongi.common.status.SuccessStatus;
+import com.ssu.ongi.domain.device.controller.docs.DeviceControllerDocs;
 import com.ssu.ongi.domain.device.dto.request.DeviceRegisterRequest;
 import com.ssu.ongi.domain.device.dto.request.HeartbeatRequest;
+import com.ssu.ongi.domain.device.dto.request.MedicationStatusRequest;
 import com.ssu.ongi.domain.device.dto.response.RegisterDeviceResponse;
 import com.ssu.ongi.domain.device.service.DeviceCommandService;
 import jakarta.validation.Valid;
@@ -44,5 +46,33 @@ public class DeviceController implements DeviceControllerDocs {
     ) {
         deviceCommandService.updateHeartbeat(deviceId, request);
         return ApiResponse.success(SuccessStatus.DEVICE_CONNECTION_SUCCESS);
+    }
+
+    @Override
+    @PostMapping("/open-all")
+    public ResponseEntity<ApiResponse<Void>> openAll(
+            @AuthenticationPrincipal MemberPrincipal principal
+    ) {
+        deviceCommandService.openAll(principal.memberId(), principal.loginMode());
+        return ApiResponse.success(SuccessStatus.DEVICE_OPEN_ALL_SUCCESS);
+    }
+
+    @Override
+    @PostMapping("/close-all")
+    public ResponseEntity<ApiResponse<Void>> closeAll(
+            @AuthenticationPrincipal MemberPrincipal principal
+    ) {
+        deviceCommandService.closeAll(principal.memberId(), principal.loginMode());
+        return ApiResponse.success(SuccessStatus.DEVICE_CLOSE_ALL_SUCCESS);
+    }
+
+    @Override
+    @PostMapping("/medication-status")
+    public ResponseEntity<ApiResponse<Void>> updateMedicationStatus(
+            @RequestAttribute Long deviceId,
+            @Valid @RequestBody MedicationStatusRequest request
+    ) {
+        deviceCommandService.updateMedicationStatus(deviceId, request);
+        return ApiResponse.success(SuccessStatus.MEDICATION_STATUS_UPDATE_SUCCESS);
     }
 }

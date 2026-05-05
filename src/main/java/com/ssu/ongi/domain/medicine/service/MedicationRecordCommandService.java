@@ -4,13 +4,13 @@ import com.ssu.ongi.common.exception.GeneralException;
 import com.ssu.ongi.common.status.ErrorStatus;
 import com.ssu.ongi.domain.device.entity.Device;
 import com.ssu.ongi.domain.device.repository.DeviceRepository;
+import com.ssu.ongi.domain.device.service.DeviceSlotQueryService;
 import com.ssu.ongi.domain.medicine.dto.request.MedicationIntakeItem;
 import com.ssu.ongi.domain.medicine.dto.request.MedicationRecordSyncRequest;
 import com.ssu.ongi.domain.medicine.entity.MedicationRecord;
-import com.ssu.ongi.domain.medicine.entity.MedicineSchedule;
+import com.ssu.ongi.domain.medicine.entity.Medicine;
 import com.ssu.ongi.domain.medicine.enums.MedicationResult;
 import com.ssu.ongi.domain.medicine.repository.MedicationRecordRepository;
-import com.ssu.ongi.domain.medicine.repository.MedicineScheduleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,30 +28,31 @@ import java.util.stream.Collectors;
 public class MedicationRecordCommandService {
 
     private final MedicationRecordRepository medicationRecordRepository;
-    private final MedicineScheduleRepository medicineScheduleRepository;
     private final DeviceRepository deviceRepository;
+    private final DeviceSlotQueryService deviceSlotQueryService;
 
-    public void saveMedicationIntake(Long deviceId, Integer dispenserSlot,
-                                    MedicationResult result, LocalDateTime recordedAt) {
+    /**
+     * 디바이스로부터 단건 복약 이벤트를 수신하여 저장합니다.
+     */
+    public void saveMedicationIntake(Long deviceId, Integer slotNumber,
+                                     MedicationResult result, LocalDateTime recordedAt) {
         Device device = deviceRepository.findById(deviceId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.DEVICE_NOT_FOUND));
 
         Long elderId = device.getElder().getId();
+        Medicine medicine = deviceSlotQueryService.getMedicineByElderIdAndSlotNumber(elderId, slotNumber);
 
-        MedicineSchedule schedule = medicineScheduleRepository
-                .findByElderIdAndDispenserSlot(elderId, dispenserSlot)
-                .orElseThrow(() -> new GeneralException(ErrorStatus.SCHEDULE_NOT_FOUND));
-
-        if (medicationRecordRepository.existsByMedicineScheduleIdAndRecordedAt(schedule.getId(), recordedAt)) {
+        if (medicationRecordRepository.existsByMedicineIdAndRecordedAt(medicine.getId(), recordedAt)) {
             return;
         }
 
-        MedicationRecord record = MedicationRecord.create(schedule, device, result, recordedAt);
-        medicationRecordRepository.save(record);
+        medicationRecordRepository.save(MedicationRecord.create(medicine, device, result, recordedAt));
     }
 
+    /**
+     * 디바이스 재연결 시 오프라인 기록을 일괄 동기화합니다.
+     */
     public void saveMedicationIntakes(MedicationRecordSyncRequest request) {
-        // 필요한 Device 일괄 조회
         Set<Long> deviceIds = request.records().stream()
                 .map(MedicationIntakeItem::deviceId)
                 .collect(Collectors.toSet());
@@ -67,15 +68,13 @@ public class MedicationRecordCommandService {
             }
 
             Long elderId = device.getElder().getId();
-            MedicineSchedule schedule = medicineScheduleRepository
-                    .findByElderIdAndDispenserSlot(elderId, item.dispenserSlot())
-                    .orElseThrow(() -> new GeneralException(ErrorStatus.SCHEDULE_NOT_FOUND));
+            Medicine medicine = deviceSlotQueryService.getMedicineByElderIdAndSlotNumber(elderId, item.dispenserSlot());
 
-            if (medicationRecordRepository.existsByMedicineScheduleIdAndRecordedAt(schedule.getId(), item.recordedAt())) {
+            if (medicationRecordRepository.existsByMedicineIdAndRecordedAt(medicine.getId(), item.recordedAt())) {
                 continue;
             }
 
-            toSave.add(MedicationRecord.create(schedule, device, item.result(), item.recordedAt()));
+            toSave.add(MedicationRecord.create(medicine, device, item.result(), item.recordedAt()));
         }
 
         if (!toSave.isEmpty()) {

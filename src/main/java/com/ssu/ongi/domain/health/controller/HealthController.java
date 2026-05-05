@@ -2,6 +2,7 @@ package com.ssu.ongi.domain.health.controller;
 
 import com.ssu.ongi.common.response.ApiResponse;
 import com.ssu.ongi.common.status.SuccessStatus;
+import com.ssu.ongi.domain.health.controller.docs.HealthControllerDocs;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

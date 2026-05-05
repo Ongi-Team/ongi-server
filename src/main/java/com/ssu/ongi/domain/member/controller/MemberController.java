@@ -3,6 +3,7 @@ package com.ssu.ongi.domain.member.controller;
 import com.ssu.ongi.common.jwt.MemberPrincipal;
 import com.ssu.ongi.common.response.ApiResponse;
 import com.ssu.ongi.common.status.SuccessStatus;
+import com.ssu.ongi.domain.member.controller.docs.MemberControllerDocs;
 import com.ssu.ongi.domain.member.dto.request.FcmTokenRequest;
 import com.ssu.ongi.domain.member.service.MemberCommandService;
 import jakarta.validation.Valid;

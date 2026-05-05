@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalTime;
+
 @Entity
 @Table(name = "medicine")
 @Getter
@@ -26,16 +28,21 @@ public class Medicine extends BaseEntity {
     @Column(nullable = false)
     private String name;
 
+    @Column(nullable = false)
+    private LocalTime scheduledTime;
+
     @Builder
-    private Medicine(Elder elder, String name) {
+    private Medicine(Elder elder, String name, LocalTime scheduledTime) {
         this.elder = elder;
         this.name = name;
+        this.scheduledTime = scheduledTime;
     }
 
-    public static Medicine create(Elder elder, String name) {
+    public static Medicine create(Elder elder, String name, LocalTime scheduledTime) {
         return Medicine.builder()
                 .elder(elder)
                 .name(name)
+                .scheduledTime(scheduledTime)
                 .build();
     }
 }

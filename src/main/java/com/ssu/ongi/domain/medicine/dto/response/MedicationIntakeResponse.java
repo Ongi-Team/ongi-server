@@ -16,8 +16,8 @@ public record MedicationIntakeResponse(
     public static MedicationIntakeResponse from(MedicationRecord record) {
         return new MedicationIntakeResponse(
                 record.getId(),
-                record.getMedicineSchedule().getMedicine().getName(),
-                record.getMedicineSchedule().getScheduledTime(),
+                record.getMedicine().getName(),
+                record.getMedicine().getScheduledTime(),
                 record.getResult(),
                 record.getRecordedAt()
         );

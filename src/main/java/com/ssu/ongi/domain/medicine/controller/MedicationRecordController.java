@@ -2,6 +2,7 @@ package com.ssu.ongi.domain.medicine.controller;
 
 import com.ssu.ongi.common.response.ApiResponse;
 import com.ssu.ongi.common.status.SuccessStatus;
+import com.ssu.ongi.domain.medicine.controller.docs.MedicationRecordControllerDocs;
 import com.ssu.ongi.domain.medicine.dto.request.MedicationRecordSyncRequest;
 import com.ssu.ongi.domain.medicine.dto.response.MedicationIntakeResponse;
 import com.ssu.ongi.domain.medicine.service.MedicationRecordCommandService;
@@ -49,12 +50,12 @@ public class MedicationRecordController implements MedicationRecordControllerDoc
     }
 
     @Override
-    @GetMapping("/schedule/{scheduleId}")
-    public ResponseEntity<ApiResponse<List<MedicationIntakeResponse>>> getRecordsBySchedule(
-            @PathVariable Long scheduleId,
+    @GetMapping("/medicine/{medicineId}")
+    public ResponseEntity<ApiResponse<List<MedicationIntakeResponse>>> getRecordsByMedicine(
+            @PathVariable Long medicineId,
             @RequestParam Long elderId
     ) {
-        List<MedicationIntakeResponse> response = medicationRecordQueryService.getRecordsBySchedule(scheduleId, elderId);
+        List<MedicationIntakeResponse> response = medicationRecordQueryService.getRecordsByMedicine(medicineId, elderId);
         return ApiResponse.success(SuccessStatus.GET_MEDICATION_RECORD_SUCCESS, response);
     }
 }

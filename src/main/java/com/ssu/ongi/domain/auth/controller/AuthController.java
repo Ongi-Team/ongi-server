@@ -1,5 +1,6 @@
 package com.ssu.ongi.domain.auth.controller;
 
+import com.ssu.ongi.domain.auth.controller.docs.AuthControllerDocs;
 import com.ssu.ongi.domain.auth.dto.response.ReissueResponse;
 import com.ssu.ongi.common.response.ApiResponse;
 import com.ssu.ongi.common.status.SuccessStatus;

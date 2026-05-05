@@ -1,4 +1,4 @@
-package com.ssu.ongi.domain.auth.controller;
+package com.ssu.ongi.domain.auth.controller.docs;
 
 import com.ssu.ongi.domain.auth.dto.response.ReissueResponse;
 import com.ssu.ongi.common.response.ApiResponse;

@@ -2,6 +2,7 @@ package com.ssu.ongi.domain.medicine.repository;
 
 import com.ssu.ongi.domain.medicine.entity.MedicationRecord;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -10,14 +11,18 @@ import java.util.List;
 
 public interface MedicationRecordRepository extends JpaRepository<MedicationRecord, Long> {
 
-    boolean existsByMedicineScheduleIdAndRecordedAt(Long scheduleId, LocalDateTime recordedAt);
+    boolean existsByMedicineIdAndRecordedAt(Long medicineId, LocalDateTime recordedAt);
 
-    void deleteAllByMedicineScheduleId(Long scheduleId);
+    @Modifying(clearAutomatically = true)
+    void deleteAllByMedicineId(Long medicineId);
+
+    @Modifying(clearAutomatically = true)
+    @Query("DELETE FROM MedicationRecord mr WHERE mr.medicine.elder.id = :elderId")
+    void deleteAllByElderId(@Param("elderId") Long elderId);
 
     @Query("SELECT mr FROM MedicationRecord mr " +
-            "JOIN FETCH mr.medicineSchedule ms " +
-            "JOIN FETCH ms.medicine " +
-            "WHERE ms.medicine.elder.id = :elderId " +
+            "JOIN FETCH mr.medicine m " +
+            "WHERE m.elder.id = :elderId " +
             "AND mr.recordedAt BETWEEN :start AND :end " +
             "ORDER BY mr.recordedAt ASC")
     List<MedicationRecord> findAllByElderIdAndRecordedAtBetween(
@@ -26,8 +31,8 @@ public interface MedicationRecordRepository extends JpaRepository<MedicationReco
             @Param("end") LocalDateTime end);
 
     @Query("SELECT mr FROM MedicationRecord mr " +
-            "JOIN FETCH mr.medicineSchedule ms " +
-            "WHERE ms.id = :scheduleId " +
+            "JOIN FETCH mr.medicine " +
+            "WHERE mr.medicine.id = :medicineId " +
             "ORDER BY mr.recordedAt ASC")
-    List<MedicationRecord> findAllByMedicineScheduleId(@Param("scheduleId") Long scheduleId);
+    List<MedicationRecord> findAllByMedicineId(@Param("medicineId") Long medicineId);
 }
