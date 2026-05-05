@@ -1,6 +1,8 @@
 package com.ssu.ongi.domain.medicine.service;
 
 import com.ssu.ongi.common.exception.GeneralException;
+import com.ssu.ongi.common.mqtt.DeviceTopic;
+import com.ssu.ongi.common.mqtt.MqttPublisher;
 import com.ssu.ongi.common.status.ErrorStatus;
 import com.ssu.ongi.domain.device.entity.Device;
 import com.ssu.ongi.domain.device.service.DeviceQueryService;
@@ -34,9 +36,10 @@ public class MedicineCommandService {
     private final DeviceQueryService deviceQueryService;
     private final DeviceSlotCommandService deviceSlotCommandService;
     private final ElderQueryService elderQueryService;
+    private final MqttPublisher mqttPublisher;
 
     /**
-     * 기존 스케줄 전체 삭제 후 새 스케줄 등록 및 슬롯 할당
+     * 기존 스케줄 전체 삭제 후 새 스케줄 등록, 슬롯 할당, 디바이스에 업데이트 알림 전송
      */
     public void registerSchedules(Long memberId, RegisterMedicineScheduleRequest request) {
         Elder elder = elderQueryService.getElderByMemberId(memberId);
@@ -48,6 +51,7 @@ public class MedicineCommandService {
 
         List<Medicine> savedMedicines = createAndSaveMedicines(elder, sortedItems);
         deviceSlotCommandService.assignSlots(elder, device, savedMedicines);
+        mqttPublisher.publish(DeviceTopic.scheduleUpdated(device.getDeviceToken()), "SCHEDULE_UPDATED");
     }
 
     /**

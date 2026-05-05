@@ -13,4 +13,8 @@ public class DeviceTopic {
     public static String closeAll(String deviceToken) {
         return String.format(DEVICE_PREFIX + "/command/close-all", deviceToken);
     }
+
+    public static String scheduleUpdated(String deviceToken) {
+        return String.format(DEVICE_PREFIX + "/command/schedule-updated", deviceToken);
+    }
 }
