@@ -30,9 +30,6 @@ public class Elder extends BaseEntity {
     @Column(nullable = false)
     private Integer age;
 
-    @Column
-    private String phone;
-
     @Column(nullable = false)
     private String relationship;
 
@@ -44,18 +41,16 @@ public class Elder extends BaseEntity {
     private OsType osType;
 
     @Builder
-    private Elder(String name, Integer age, String phone, String relationship) {
+    private Elder(String name, Integer age, String relationship) {
         this.name = name;
         this.age = age;
-        this.phone = phone;
         this.relationship = relationship;
     }
 
-    public static Elder create(String name, Integer age, String phone, String relationship) {
+    public static Elder create(String name, Integer age, String relationship) {
         return Elder.builder()
                 .name(name)
                 .age(age)
-                .phone(phone)
                 .relationship(relationship)
                 .build();
     }

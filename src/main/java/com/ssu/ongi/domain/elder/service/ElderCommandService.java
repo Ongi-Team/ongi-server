@@ -21,7 +21,6 @@ public class ElderCommandService {
         return Elder.create(
                 request.name(),
                 request.age(),
-                request.phone(),
                 request.relationship()
         );
     }
