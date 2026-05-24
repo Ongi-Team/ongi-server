@@ -9,14 +9,25 @@ import com.ssu.ongi.domain.device.dto.request.HeartbeatRequest;
 import com.ssu.ongi.domain.device.dto.request.MedicationStatusRequest;
 import com.ssu.ongi.domain.device.dto.response.RegisterDeviceResponse;
 import com.ssu.ongi.domain.device.entity.Device;
+import com.ssu.ongi.domain.device.entity.DeviceSlot;
+import com.ssu.ongi.domain.device.enums.SlotStatus;
 import com.ssu.ongi.domain.device.repository.DeviceRepository;
 import com.ssu.ongi.domain.elder.entity.Elder;
 import com.ssu.ongi.domain.elder.service.ElderQueryService;
+import com.ssu.ongi.domain.medicine.entity.MedicationRecord;
+import com.ssu.ongi.domain.medicine.enums.MedicationResult;
+import com.ssu.ongi.domain.medicine.service.MedicationRecordCommandService;
 import com.ssu.ongi.domain.member.enums.LoginMode;
+import com.ssu.ongi.domain.notification.event.MedicationTakenEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -24,10 +35,14 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class DeviceCommandService {
 
+    private static final ZoneId KOREA_ZONE = ZoneId.of("Asia/Seoul");
+
     private final DeviceRepository deviceRepository;
     private final ElderQueryService elderQueryService;
     private final MqttPublisher mqttPublisher;
     private final DeviceSlotCommandService deviceSlotCommandService;
+    private final MedicationRecordCommandService medicationRecordCommandService;
+    private final ApplicationEventPublisher eventPublisher;
 
     /**
      * 보호자의 어르신에게 디바이스를 등록하고 deviceToken을 발급합니다.
@@ -70,8 +85,30 @@ public class DeviceCommandService {
      * 디바이스로부터 복약 상태를 수신하여 슬롯 상태를 업데이트합니다.
      */
     public void updateMedicationStatus(Long deviceId, MedicationStatusRequest request) {
-        deviceSlotCommandService.updateMedicationStatus(deviceId, request.slotNumber(), request.status());
-        // TODO FCM 알림 전송 추가
+        DeviceSlot deviceSlot = deviceSlotCommandService.updateMedicationStatus(
+                deviceId, request.slotNumber(), request.status()
+        );
+
+        if (request.status() != SlotStatus.TAKEN) {
+            return;
+        }
+
+        LocalDateTime recordedAt = LocalDateTime.now(KOREA_ZONE);
+        Optional<MedicationRecord> medicationRecord = medicationRecordCommandService.saveMedicationIntake(
+                deviceId,
+                request.slotNumber(),
+                MedicationResult.TAKEN,
+                recordedAt
+        );
+
+        medicationRecord.ifPresent(record -> eventPublisher.publishEvent(new MedicationTakenEvent(
+                deviceSlot.getElder().getMember().getId(),
+                deviceSlot.getElder().getId(),
+                deviceSlot.getMedicine().getId(),
+                deviceSlot.getElder().getMember().getFcmToken(),
+                deviceSlot.getMedicine().getName(),
+                recordedAt
+        )));
     }
 
     /**

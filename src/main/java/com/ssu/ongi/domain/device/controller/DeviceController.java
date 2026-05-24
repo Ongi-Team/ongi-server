@@ -32,9 +32,7 @@ public class DeviceController implements DeviceControllerDocs {
             @AuthenticationPrincipal MemberPrincipal principal,
             @Valid @RequestBody DeviceRegisterRequest request
     ) {
-        RegisterDeviceResponse response = deviceCommandService.registerDevice(
-                principal.memberId(), principal.loginMode(), request
-        );
+        RegisterDeviceResponse response = deviceCommandService.registerDevice(principal.memberId(), principal.loginMode(), request);
         return ApiResponse.success(SuccessStatus.DEVICE_REGISTER_SUCCESS, response);
     }
 
