@@ -1,10 +1,12 @@
 package com.ssu.ongi.domain.auth.controller.docs;
 
-import com.ssu.ongi.domain.auth.dto.response.ReissueResponse;
 import com.ssu.ongi.common.response.ApiResponse;
 import com.ssu.ongi.domain.auth.dto.request.SendVerificationRequest;
 import com.ssu.ongi.domain.auth.dto.request.VerifyCodeRequest;
+import com.ssu.ongi.domain.auth.dto.response.LoginStartResponse;
+import com.ssu.ongi.domain.auth.dto.response.ReissueResponse;
 import com.ssu.ongi.domain.member.dto.request.FindIdRequest;
+import com.ssu.ongi.domain.member.dto.request.LoginModeRequest;
 import com.ssu.ongi.domain.member.dto.request.LoginRequest;
 import com.ssu.ongi.domain.member.dto.request.ReissueRequest;
 import com.ssu.ongi.domain.member.dto.request.SignupRequest;
@@ -107,10 +109,57 @@ public interface AuthControllerDocs {
     );
 
 
-    @Operation(summary = "로그인", description = """
-            아이디/비밀번호로 로그인하고 모드를 선택합니다.
-            - GUARDIAN 모드: 보호자 정보 + 등록된 모든 어르신 목록 반환
-            - ELDER 모드: 첫 번째 어르신 정보만 반환
+    @Operation(summary = "로그인 1단계", description = "아이디/비밀번호를 검증하고 역할 선택에 사용할 로그인 세션 토큰을 발급합니다.")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "로그인 정보 검증 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = LoginStartResponse.class),
+                            examples = @ExampleObject(value = """
+                                    {
+                                      "isSuccess": true,
+                                      "code": "AUTH_200",
+                                      "message": "로그인에 성공하였습니다.",
+                                      "data": {
+                                        "loginSessionToken": "550e8400-e29b-41d4-a716-446655440000"
+                                      }
+                                    }
+                                    """))
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "400",
+                    description = "유효성 검사 실패 (아이디/비밀번호 누락)",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                                    {
+                                      "isSuccess": false,
+                                      "code": "COMMON_400",
+                                      "message": "아이디를 입력해주세요."
+                                    }
+                                    """))
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "401",
+                    description = "아이디 또는 비밀번호 불일치",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                                    {
+                                      "isSuccess": false,
+                                      "code": "AUTH_401",
+                                      "message": "아이디 또는 비밀번호가 올바르지 않습니다."
+                                    }
+                                    """))
+            )
+    })
+    ResponseEntity<ApiResponse<LoginStartResponse>> login(@Valid @RequestBody LoginRequest request);
+
+
+    @Operation(summary = "로그인 2단계 - 역할 선택", description = """
+            로그인 세션 토큰과 선택한 모드로 실제 JWT를 발급합니다.
+            현재 정책상 보호자 계정당 어르신은 1명이며, 응답도 elder 단일 객체로 반환합니다.
+            - GUARDIAN 모드: 보호자 정보 + 어르신 정보 반환
+            - ELDER 모드: 어르신 정보 반환
             """)
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -126,9 +175,10 @@ public interface AuthControllerDocs {
                                               "message": "로그인에 성공하였습니다.",
                                               "data": {
                                                 "accessToken": "eyJhbGciOiJIUzI1NiJ9...",
+                                                "refreshToken": "eyJhbGciOiJIUzI1NiJ9...",
                                                 "loginMode": "GUARDIAN",
                                                 "member": { "memberId": 1, "name": "홍길동", "phone": "010-1234-5678" },
-                                                "elders": [{ "elderId": 1, "name": "홍부모", "age": 75, "relationship": "부모" }]
+                                                "elder": { "elderId": 1, "name": "홍부모", "age": 75, "relationship": "부모" }
                                               }
                                             }
                                             """),
@@ -139,6 +189,7 @@ public interface AuthControllerDocs {
                                               "message": "로그인에 성공하였습니다.",
                                               "data": {
                                                 "accessToken": "eyJhbGciOiJIUzI1NiJ9...",
+                                                "refreshToken": "eyJhbGciOiJIUzI1NiJ9...",
                                                 "loginMode": "ELDER",
                                                 "elder": { "elderId": 1, "name": "홍부모", "age": 75, "relationship": "부모" }
                                               }
@@ -148,7 +199,7 @@ public interface AuthControllerDocs {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "400",
-                    description = "유효성 검사 실패 (아이디/비밀번호/로그인 모드 누락)",
+                    description = "유효성 검사 실패 (로그인 세션 토큰/로그인 모드/FCM 토큰/OS 타입 누락)",
                     content = @Content(mediaType = "application/json",
                             examples = @ExampleObject(value = """
                                     {
@@ -160,30 +211,30 @@ public interface AuthControllerDocs {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "401",
-                    description = "아이디 또는 비밀번호 불일치",
+                    description = "로그인 세션 만료 또는 존재하지 않음",
                     content = @Content(mediaType = "application/json",
                             examples = @ExampleObject(value = """
                                     {
                                       "isSuccess": false,
                                       "code": "AUTH_401",
-                                      "message": "아이디 또는 비밀번호가 올바르지 않습니다."
+                                      "message": "로그인 세션이 만료되었습니다. 다시 로그인해주세요."
                                     }
                                     """))
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "404",
-                    description = "어르신 정보 없음",
+                    description = "회원 또는 어르신 정보 없음",
                     content = @Content(mediaType = "application/json",
                             examples = @ExampleObject(value = """
                                     {
                                       "isSuccess": false,
-                                      "code": "AUTH_404_2",
+                                      "code": "AUTH_404",
                                       "message": "어르신 정보를 찾을 수 없습니다."
                                     }
                                     """))
             )
     })
-    ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody LoginRequest request);
+    ResponseEntity<ApiResponse<LoginResponse>> selectLoginMode(@Valid @RequestBody LoginModeRequest request);
 
 
     @Operation(summary = "로그아웃", description = "RefreshToken을 폐기하고 FCM 토큰을 삭제합니다.")

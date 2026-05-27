@@ -140,7 +140,18 @@ src
 - 모든 커스텀 예외는 `BaseStatus` 기반으로 정의
 - HTTP Status 명확히 구분하여 반환
 
-### (6) 코드 리뷰 기준
+### (6) 설정
+
+- 로그인 세션 TTL은 `auth.login-session-expiration`으로 설정
+- 단위는 millisecond이며 기본값은 `300000`(5분)
+- 로컬/운영 설정 예시:
+
+```yaml
+auth:
+  login-session-expiration: 300000
+```
+
+### (7) 코드 리뷰 기준
 
 - 네이밍이 직관적인가
 - 각 클래스와 메서드의 책임이 명확한가

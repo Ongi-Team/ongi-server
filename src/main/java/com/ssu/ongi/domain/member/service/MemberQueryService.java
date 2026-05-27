@@ -22,6 +22,11 @@ public class MemberQueryService {
                 .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
     }
 
+    public Member findByIdWithElders(Long memberId) {
+        return memberQueryRepository.findByIdWithElders(memberId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+    }
+
     // 로그인 전용 - elders JOIN FETCH로 N+1 방지
     public Member findByLoginIdWithElders(String loginId) {
         return memberQueryRepository.findByLoginIdWithElders(loginId)

@@ -68,7 +68,11 @@ public class JwtTokenProvider {
     }
 
     public LoginMode getLoginMode(String token) {
-        return LoginMode.valueOf(getAccessClaims(token).get("loginMode", String.class));
+        String loginMode = getAccessClaims(token).get("loginMode", String.class);
+        if (loginMode == null) {
+            throw new IllegalArgumentException("loginMode claim이 없습니다.");
+        }
+        return LoginMode.valueOf(loginMode);
     }
 
     private Claims getAccessClaims(String token) {

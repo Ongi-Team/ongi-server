@@ -12,6 +12,9 @@ public interface MemberQueryRepository extends Repository<Member, Long> {
     @Query("SELECT m FROM Member m JOIN FETCH m.elders WHERE m.loginId = :loginId")
     Optional<Member> findByLoginIdWithElders(@Param("loginId") String loginId);
 
+    @Query("SELECT m FROM Member m JOIN FETCH m.elders WHERE m.id = :id")
+    Optional<Member> findByIdWithElders(@Param("id") Long id);
+
     Optional<Member> findByLoginId(String loginId);
 
     Optional<Member> findById(Long id);
