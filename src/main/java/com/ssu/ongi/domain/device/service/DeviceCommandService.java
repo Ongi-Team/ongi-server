@@ -95,8 +95,7 @@ public class DeviceCommandService {
 
         LocalDateTime recordedAt = LocalDateTime.now(KOREA_ZONE);
         Optional<MedicationRecord> medicationRecord = medicationRecordCommandService.saveMedicationIntake(
-                deviceId,
-                request.slotNumber(),
+                deviceSlot,
                 MedicationResult.TAKEN,
                 recordedAt
         );

@@ -3,6 +3,7 @@ package com.ssu.ongi.domain.medicine.service;
 import com.ssu.ongi.common.exception.GeneralException;
 import com.ssu.ongi.common.status.ErrorStatus;
 import com.ssu.ongi.domain.device.entity.Device;
+import com.ssu.ongi.domain.device.entity.DeviceSlot;
 import com.ssu.ongi.domain.device.repository.DeviceRepository;
 import com.ssu.ongi.domain.device.service.DeviceSlotQueryService;
 import com.ssu.ongi.domain.medicine.dto.request.MedicationIntakeItem;
@@ -15,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -35,13 +35,11 @@ public class MedicationRecordCommandService {
     /**
      * 디바이스로부터 단건 복약 이벤트를 수신하여 저장합니다.
      */
-    public Optional<MedicationRecord> saveMedicationIntake(Long deviceId, Integer slotNumber,
-                                                           MedicationResult result, LocalDateTime recordedAt) {
-        Device device = deviceRepository.findById(deviceId)
-                .orElseThrow(() -> new GeneralException(ErrorStatus.DEVICE_NOT_FOUND));
-
-        Long elderId = device.getElder().getId();
-        Medicine medicine = deviceSlotQueryService.getMedicineByElderIdAndSlotNumber(elderId, slotNumber);
+    public Optional<MedicationRecord> saveMedicationIntake(DeviceSlot deviceSlot,
+                                                           MedicationResult result,
+                                                           java.time.LocalDateTime recordedAt) {
+        Device device = deviceSlot.getDevice();
+        Medicine medicine = deviceSlot.getMedicine();
 
         if (medicationRecordRepository.existsByMedicineIdAndRecordedAt(medicine.getId(), recordedAt)) {
             return Optional.empty();
