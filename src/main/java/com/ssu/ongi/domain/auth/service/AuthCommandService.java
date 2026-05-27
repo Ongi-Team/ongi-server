@@ -20,6 +20,7 @@ import com.ssu.ongi.domain.member.enums.LoginMode;
 import com.ssu.ongi.domain.member.service.MemberCommandService;
 import com.ssu.ongi.domain.member.service.MemberQueryService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +29,7 @@ import java.util.UUID;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class AuthCommandService {
 
     private final MemberCommandService memberCommandService;
@@ -58,19 +60,25 @@ public class AuthCommandService {
     public LoginResponse selectLoginMode(LoginModeRequest request) {
         Long memberId = loginSessionRepository.consume(request.loginSessionToken())
                 .orElseThrow(() -> new GeneralException(ErrorStatus.LOGIN_SESSION_EXPIRED));
-        Member member = memberQueryService.findByIdWithElders(memberId);
 
-        if (request.loginMode() == LoginMode.GUARDIAN) {
-            memberCommandService.updateFcmToken(member, request.fcmToken(), request.osType());
-        } else {
-            Elder elder = member.getElders().stream()
-                    .findFirst()
-                    .orElseThrow(() -> new GeneralException(ErrorStatus.ELDER_NOT_FOUND));
-            elderCommandService.updateFcmToken(elder, request.fcmToken(),request.osType());
+        try {
+            Member member = memberQueryService.findByIdWithElders(memberId);
+
+            if (request.loginMode() == LoginMode.GUARDIAN) {
+                memberCommandService.updateFcmToken(member, request.fcmToken(), request.osType());
+            } else {
+                Elder elder = member.getElders().stream()
+                        .findFirst()
+                        .orElseThrow(() -> new GeneralException(ErrorStatus.ELDER_NOT_FOUND));
+                elderCommandService.updateFcmToken(elder, request.fcmToken(),request.osType());
+            }
+
+            TokenPair tokens = tokenCommandService.issueTokens(member.getId(), request.loginMode());
+            return LoginResponse.of(tokens.accessToken(), tokens.refreshToken(), request.loginMode(), member);
+        } catch (RuntimeException e) {
+            log.warn("로그인 세션 소비 후 로그인 모드 선택 처리 실패: memberId={}, loginMode={}", memberId, request.loginMode(), e);
+            throw e;
         }
-
-        TokenPair tokens = tokenCommandService.issueTokens(member.getId(), request.loginMode());
-        return LoginResponse.of(tokens.accessToken(), tokens.refreshToken(), request.loginMode(), member);
     }
 
     public void logout(Long memberId, LoginMode loginMode) {
