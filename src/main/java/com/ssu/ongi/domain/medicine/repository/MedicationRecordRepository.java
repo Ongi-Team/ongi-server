@@ -14,13 +14,6 @@ public interface MedicationRecordRepository extends JpaRepository<MedicationReco
 
     boolean existsByMedicineIdAndRecordedAt(Long medicineId, LocalDateTime recordedAt);
 
-    boolean existsByMedicineIdAndResultAndRecordedAtBetween(
-            Long medicineId,
-            MedicationResult result,
-            LocalDateTime start,
-            LocalDateTime end
-    );
-
     @Modifying(clearAutomatically = true)
     void deleteAllByMedicineId(Long medicineId);
 
