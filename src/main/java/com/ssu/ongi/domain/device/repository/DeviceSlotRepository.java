@@ -24,6 +24,16 @@ public interface DeviceSlotRepository extends JpaRepository<DeviceSlot, Long> {
 
     Optional<DeviceSlot> findByDeviceIdAndSlotNumber(Long deviceId, Integer slotNumber);
 
+    @Query("SELECT ds FROM DeviceSlot ds " +
+            "JOIN FETCH ds.elder e " +
+            "JOIN FETCH e.member " +
+            "JOIN FETCH ds.medicine " +
+            "WHERE ds.device.id = :deviceId AND ds.slotNumber = :slotNumber")
+    Optional<DeviceSlot> findByDeviceIdAndSlotNumberWithDetails(
+            @Param("deviceId") Long deviceId,
+            @Param("slotNumber") Integer slotNumber
+    );
+
     List<DeviceSlot> findAllByElderIdOrderByMedicineScheduledTimeAsc(Long elderId);
 
     @Query("SELECT ds FROM DeviceSlot ds JOIN FETCH ds.medicine WHERE ds.elder.id = :elderId")

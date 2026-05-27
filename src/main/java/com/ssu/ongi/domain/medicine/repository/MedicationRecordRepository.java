@@ -1,6 +1,7 @@
 package com.ssu.ongi.domain.medicine.repository;
 
 import com.ssu.ongi.domain.medicine.entity.MedicationRecord;
+import com.ssu.ongi.domain.medicine.enums.MedicationResult;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
