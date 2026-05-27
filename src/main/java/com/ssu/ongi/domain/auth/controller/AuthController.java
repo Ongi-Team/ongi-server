@@ -1,6 +1,7 @@
 package com.ssu.ongi.domain.auth.controller;
 
 import com.ssu.ongi.domain.auth.controller.docs.AuthControllerDocs;
+import com.ssu.ongi.domain.auth.dto.response.LoginStartResponse;
 import com.ssu.ongi.domain.auth.dto.response.ReissueResponse;
 import com.ssu.ongi.common.response.ApiResponse;
 import com.ssu.ongi.common.status.SuccessStatus;
@@ -10,6 +11,7 @@ import com.ssu.ongi.domain.auth.service.AuthCommandService;
 import com.ssu.ongi.domain.auth.service.PhoneVerificationService;
 import com.ssu.ongi.domain.auth.service.AuthQueryService;
 import com.ssu.ongi.domain.member.dto.request.FindIdRequest;
+import com.ssu.ongi.domain.member.dto.request.LoginModeRequest;
 import com.ssu.ongi.domain.member.dto.request.LoginRequest;
 import com.ssu.ongi.domain.member.dto.request.ReissueRequest;
 import com.ssu.ongi.domain.member.dto.request.SignupRequest;
@@ -60,10 +62,19 @@ public class AuthController implements AuthControllerDocs {
 
     @Override
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<LoginResponse>> login(
+    public ResponseEntity<ApiResponse<LoginStartResponse>> login(
             @Valid @RequestBody LoginRequest request
     ) {
-        LoginResponse response = authCommandService.login(request);
+        LoginStartResponse response = authCommandService.login(request);
+        return ApiResponse.success(SuccessStatus.LOGIN_SUCCESS, response);
+    }
+
+    @Override
+    @PostMapping("/login/mode")
+    public ResponseEntity<ApiResponse<LoginResponse>> selectLoginMode(
+            @Valid @RequestBody LoginModeRequest request
+    ) {
+        LoginResponse response = authCommandService.selectLoginMode(request);
         return ApiResponse.success(SuccessStatus.LOGIN_SUCCESS, response);
     }
 

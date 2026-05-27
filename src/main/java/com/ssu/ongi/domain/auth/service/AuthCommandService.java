@@ -4,9 +4,11 @@ import com.ssu.ongi.common.exception.GeneralException;
 import com.ssu.ongi.common.jwt.TokenCommandService;
 import com.ssu.ongi.common.jwt.TokenPair;
 import com.ssu.ongi.common.status.ErrorStatus;
+import com.ssu.ongi.domain.auth.dto.response.LoginStartResponse;
 import com.ssu.ongi.domain.auth.dto.response.ReissueResponse;
 import com.ssu.ongi.domain.elder.entity.Elder;
 import com.ssu.ongi.domain.elder.service.ElderCommandService;
+import com.ssu.ongi.domain.member.dto.request.LoginModeRequest;
 import com.ssu.ongi.domain.member.dto.request.LoginRequest;
 import com.ssu.ongi.domain.member.dto.request.ReissueRequest;
 import com.ssu.ongi.domain.member.dto.request.SignupRequest;
@@ -40,9 +42,17 @@ public class AuthCommandService {
         memberCommandService.saveMember(member);
     }
 
-    public LoginResponse login(LoginRequest request) {
+    public LoginStartResponse login(LoginRequest request) {
         Member member = memberQueryService.findByLoginIdWithElders(request.loginId());
         memberQueryService.validatePassword(member, request.password());
+
+        String loginSessionToken = tokenCommandService.issueLoginSessionToken(member.getId());
+        return LoginStartResponse.from(loginSessionToken);
+    }
+
+    public LoginResponse selectLoginMode(LoginModeRequest request) {
+        Long memberId = tokenCommandService.getMemberIdFromLoginSessionToken(request.loginSessionToken());
+        Member member = memberQueryService.findByIdWithElders(memberId);
 
         if (request.loginMode() == LoginMode.GUARDIAN) {
             memberCommandService.updateFcmToken(member, request.fcmToken(), request.osType());

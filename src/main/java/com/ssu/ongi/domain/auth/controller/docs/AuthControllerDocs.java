@@ -1,10 +1,12 @@
 package com.ssu.ongi.domain.auth.controller.docs;
 
-import com.ssu.ongi.domain.auth.dto.response.ReissueResponse;
 import com.ssu.ongi.common.response.ApiResponse;
 import com.ssu.ongi.domain.auth.dto.request.SendVerificationRequest;
 import com.ssu.ongi.domain.auth.dto.request.VerifyCodeRequest;
+import com.ssu.ongi.domain.auth.dto.response.LoginStartResponse;
+import com.ssu.ongi.domain.auth.dto.response.ReissueResponse;
 import com.ssu.ongi.domain.member.dto.request.FindIdRequest;
+import com.ssu.ongi.domain.member.dto.request.LoginModeRequest;
 import com.ssu.ongi.domain.member.dto.request.LoginRequest;
 import com.ssu.ongi.domain.member.dto.request.ReissueRequest;
 import com.ssu.ongi.domain.member.dto.request.SignupRequest;
@@ -183,7 +185,9 @@ public interface AuthControllerDocs {
                                     """))
             )
     })
-    ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody LoginRequest request);
+    ResponseEntity<ApiResponse<LoginStartResponse>> login(@Valid @RequestBody LoginRequest request);
+
+    ResponseEntity<ApiResponse<LoginResponse>> selectLoginMode(@Valid @RequestBody LoginModeRequest request);
 
 
     @Operation(summary = "로그아웃", description = "RefreshToken을 폐기하고 FCM 토큰을 삭제합니다.")
