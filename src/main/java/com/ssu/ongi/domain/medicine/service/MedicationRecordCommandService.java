@@ -13,6 +13,7 @@ import com.ssu.ongi.domain.medicine.entity.Medicine;
 import com.ssu.ongi.domain.medicine.enums.MedicationResult;
 import com.ssu.ongi.domain.medicine.repository.MedicationRecordRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,10 +46,14 @@ public class MedicationRecordCommandService {
             return Optional.empty();
         }
 
-        MedicationRecord medicationRecord = medicationRecordRepository.save(
-                MedicationRecord.create(medicine, device, result, recordedAt)
-        );
-        return Optional.of(medicationRecord);
+        try {
+            MedicationRecord medicationRecord = medicationRecordRepository.saveAndFlush(
+                    MedicationRecord.create(medicine, device, result, recordedAt)
+            );
+            return Optional.of(medicationRecord);
+        } catch (DataIntegrityViolationException e) {
+            return Optional.empty();
+        }
     }
 
     /**
