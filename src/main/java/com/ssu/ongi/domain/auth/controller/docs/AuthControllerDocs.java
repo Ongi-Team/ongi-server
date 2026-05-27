@@ -157,8 +157,8 @@ public interface AuthControllerDocs {
 
     @Operation(summary = "로그인 2단계 - 역할 선택", description = """
             로그인 세션 토큰과 선택한 모드로 실제 JWT를 발급합니다.
-            - GUARDIAN 모드: 보호자 정보 + 등록된 모든 어르신 목록 반환
-            - ELDER 모드: 첫 번째 어르신 정보만 반환
+            - GUARDIAN 모드: 보호자 정보 + 어르신 정보 반환
+            - ELDER 모드: 어르신 정보 반환
             """)
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
@@ -177,7 +177,7 @@ public interface AuthControllerDocs {
                                                 "refreshToken": "eyJhbGciOiJIUzI1NiJ9...",
                                                 "loginMode": "GUARDIAN",
                                                 "member": { "memberId": 1, "name": "홍길동", "phone": "010-1234-5678" },
-                                                "elders": [{ "elderId": 1, "name": "홍부모", "age": 75, "relationship": "부모" }]
+                                                "elder": { "elderId": 1, "name": "홍부모", "age": 75, "relationship": "부모" }
                                               }
                                             }
                                             """),
