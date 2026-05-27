@@ -211,13 +211,13 @@ public interface AuthControllerDocs {
             ),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(
                     responseCode = "401",
-                    description = "로그인 세션 토큰 만료 또는 유효하지 않은 토큰",
+                    description = "로그인 세션 만료 또는 존재하지 않음",
                     content = @Content(mediaType = "application/json",
                             examples = @ExampleObject(value = """
                                     {
                                       "isSuccess": false,
-                                      "code": "JWT_401",
-                                      "message": "유효하지 않은 토큰입니다."
+                                      "code": "AUTH_401",
+                                      "message": "로그인 세션이 만료되었습니다. 다시 로그인해주세요."
                                     }
                                     """))
             ),

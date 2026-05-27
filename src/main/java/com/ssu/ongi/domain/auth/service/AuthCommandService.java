@@ -57,7 +57,7 @@ public class AuthCommandService {
 
     public LoginResponse selectLoginMode(LoginModeRequest request) {
         Long memberId = loginSessionRepository.consume(request.loginSessionToken())
-                .orElseThrow(() -> new GeneralException(ErrorStatus.JWT_INVALID));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.LOGIN_SESSION_EXPIRED));
         Member member = memberQueryService.findByIdWithElders(memberId);
 
         if (request.loginMode() == LoginMode.GUARDIAN) {
