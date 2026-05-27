@@ -52,7 +52,7 @@ public class DeviceSlotCommandService {
      * 디바이스 ID와 슬롯 번호로 해당 슬롯의 복약 상태를 업데이트합니다.
      */
     public DeviceSlot updateMedicationStatus(Long deviceId, Integer slotNumber, SlotStatus status) {
-        DeviceSlot deviceSlot = deviceSlotRepository.findByDeviceIdAndSlotNumber(deviceId, slotNumber)
+        DeviceSlot deviceSlot = deviceSlotRepository.findByDeviceIdAndSlotNumberWithDetails(deviceId, slotNumber)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.DEVICE_SLOT_NOT_FOUND));
         deviceSlot.updateStatus(status);
         return deviceSlot;
