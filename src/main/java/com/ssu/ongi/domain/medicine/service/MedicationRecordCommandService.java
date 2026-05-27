@@ -43,11 +43,7 @@ public class MedicationRecordCommandService {
         Long elderId = device.getElder().getId();
         Medicine medicine = deviceSlotQueryService.getMedicineByElderIdAndSlotNumber(elderId, slotNumber);
 
-        LocalDateTime startOfDay = recordedAt.toLocalDate().atStartOfDay();
-        LocalDateTime startOfNextDay = startOfDay.plusDays(1);
-        if (medicationRecordRepository.existsByMedicineIdAndResultAndRecordedAtBetween(
-                medicine.getId(), result, startOfDay, startOfNextDay
-        )) {
+        if (medicationRecordRepository.existsByMedicineIdAndRecordedAt(medicine.getId(), recordedAt)) {
             return Optional.empty();
         }
 
