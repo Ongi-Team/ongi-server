@@ -3,7 +3,7 @@ spring:
     name: ongi
 
   profiles:
-    default: prod
+    default: dev
 
   jackson:
     serialization:

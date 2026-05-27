@@ -41,7 +41,8 @@ public class SecurityConfig {
             "/api/auth/password",
             "/api/auth/reissue",
             "/api/auth/phone/send",
-            "/api/auth/phone/verify"
+            "/api/auth/phone/verify",
+            "/api/auth/login/mode"
     };
 
     private static final String[] HEALTH_URIS = {
