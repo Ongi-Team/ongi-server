@@ -3,8 +3,6 @@ package com.ssu.ongi.common.jwt;
 import com.ssu.ongi.common.exception.GeneralException;
 import com.ssu.ongi.common.status.ErrorStatus;
 import com.ssu.ongi.domain.member.enums.LoginMode;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,20 +15,6 @@ public class TokenCommandService {
 
     public Long getMemberIdFromRefreshToken(String refreshToken) {
         return jwtTokenProvider.getMemberIdFromRefresh(refreshToken);
-    }
-
-    public String issueLoginSessionToken(Long memberId) {
-        return jwtTokenProvider.createLoginSessionToken(memberId);
-    }
-
-    public Long getMemberIdFromLoginSessionToken(String loginSessionToken) {
-        try {
-            return jwtTokenProvider.getMemberIdFromLoginSession(loginSessionToken);
-        } catch (ExpiredJwtException e) {
-            throw new GeneralException(ErrorStatus.JWT_EXPIRED);
-        } catch (JwtException | IllegalArgumentException e) {
-            throw new GeneralException(ErrorStatus.JWT_INVALID);
-        }
     }
 
     // 로그인 시 호출 - 검증 없이 바로 발급 (기존 토큰 무효화 후 신규 발급)

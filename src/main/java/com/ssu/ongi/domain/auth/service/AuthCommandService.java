@@ -6,6 +6,7 @@ import com.ssu.ongi.common.jwt.TokenPair;
 import com.ssu.ongi.common.status.ErrorStatus;
 import com.ssu.ongi.domain.auth.dto.response.LoginStartResponse;
 import com.ssu.ongi.domain.auth.dto.response.ReissueResponse;
+import com.ssu.ongi.domain.auth.repository.LoginSessionRepository;
 import com.ssu.ongi.domain.elder.entity.Elder;
 import com.ssu.ongi.domain.elder.service.ElderCommandService;
 import com.ssu.ongi.domain.member.dto.request.LoginModeRequest;
@@ -22,6 +23,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -32,6 +35,7 @@ public class AuthCommandService {
     private final ElderCommandService elderCommandService;
     private final TokenCommandService tokenCommandService;
     private final PhoneVerificationService phoneVerificationService;
+    private final LoginSessionRepository loginSessionRepository;
 
     public void signup(SignupRequest request) {
         phoneVerificationService.validateVerified(request.phone());
@@ -46,12 +50,14 @@ public class AuthCommandService {
         Member member = memberQueryService.findByLoginIdWithElders(request.loginId());
         memberQueryService.validatePassword(member, request.password());
 
-        String loginSessionToken = tokenCommandService.issueLoginSessionToken(member.getId());
+        String loginSessionToken = UUID.randomUUID().toString();
+        loginSessionRepository.save(loginSessionToken, member.getId());
         return LoginStartResponse.from(loginSessionToken);
     }
 
     public LoginResponse selectLoginMode(LoginModeRequest request) {
-        Long memberId = tokenCommandService.getMemberIdFromLoginSessionToken(request.loginSessionToken());
+        Long memberId = loginSessionRepository.consume(request.loginSessionToken())
+                .orElseThrow(() -> new GeneralException(ErrorStatus.JWT_INVALID));
         Member member = memberQueryService.findByIdWithElders(memberId);
 
         if (request.loginMode() == LoginMode.GUARDIAN) {

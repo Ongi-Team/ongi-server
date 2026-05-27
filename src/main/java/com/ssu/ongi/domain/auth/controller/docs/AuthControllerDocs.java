@@ -122,7 +122,7 @@ public interface AuthControllerDocs {
                                       "code": "AUTH_200",
                                       "message": "로그인에 성공하였습니다.",
                                       "data": {
-                                        "loginSessionToken": "eyJhbGciOiJIUzI1NiJ9..."
+                                        "loginSessionToken": "550e8400-e29b-41d4-a716-446655440000"
                                       }
                                     }
                                     """))
