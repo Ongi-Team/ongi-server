@@ -1,5 +1,93 @@
 # CLAUDE.md
 
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Commands
+
+```bash
+# Build
+./gradlew build              # full build with tests
+./gradlew build -x test      # skip tests
+
+# Run (default profile is prod; use dev locally)
+./gradlew bootRun --args='--spring.profiles.active=dev'
+
+# Test
+./gradlew test
+./gradlew test --tests "com.ssu.ongi.<package>.<TestClassName>"
+```
+
+## Architecture
+
+Package root: `com.ssu.ongi`
+
+```
+common/
+  base/          # BaseEntity (createdAt/updatedAt via JPA auditing), BaseStatus
+  config/        # SecurityConfig, MqttConfig, FirebaseConfig, RedisConfig, SshTunnelConfig
+  exception/     # GeneralException + GeneralExceptionAdvice (centralized error handler)
+  filter/        # DeviceAuthFilter (ESP32 device-token auth)
+  jwt/           # JwtAuthenticationFilter, JwtTokenProvider, TokenCommandService, RefreshTokenRepository
+  mqtt/          # MqttPublisher, DeviceTopic (topic name helpers)
+  response/      # ApiResponse<T> wrapper, PageResponse
+  sms/           # SmsService interface, CoolSmsService (prod), MockSmsService (dev)
+  status/        # ErrorStatus, SuccessStatus enums
+
+domain/          # Feature modules; each follows controller → service → repository layering
+  auth/          # Signup, login, logout, token reissue, phone verification
+  member/        # Member (guardian) CRUD, FCM token, password update, withdrawal
+  elder/         # Elder (care recipient) management per member
+  device/        # IoT device registration, heartbeat, slot management
+  medicine/      # Medicine schedule registration, medication record sync
+  health/        # Health check endpoint only
+```
+
+**Request flow**: `JwtAuthenticationFilter` → `DeviceAuthFilter` → Controller → Service → Repository
+
+- `JwtAuthenticationFilter`: validates `Authorization: Bearer <token>`, sets `MemberPrincipal` (memberId + loginMode) in `SecurityContext`.
+- `DeviceAuthFilter`: runs only on ESP32-only paths (`/api/device/heartbeat`, `/api/device/medication-status`). Validates `Device-Token` header and sets `deviceId` as a request attribute.
+
+**Authentication modes** (`LoginMode` enum): `GUARDIAN` (full access) vs `ELDER` (restricted — no logout, no member-only features). Both share the same JWT flow; `loginMode` is embedded in the access token claim.
+
+**Token flow** (`TokenCommandService`): Login → delete old refresh token → issue new pair (RTR pattern). Reissue validates the stored token against the incoming one — mismatch triggers forced logout.
+
+**API responses** always use `ApiResponse<T>` with `isSuccess`, `code`, `message`, `data` fields.
+
+**Error handling** is centralized in `GeneralExceptionAdvice`. Add new error codes to `ErrorStatus`, new success codes to `SuccessStatus`.
+
+**Swagger docs**: Swagger annotations go on the `*ControllerDocs` interface, not the controller class.
+
+## Database & Profiles
+
+- **dev profile**: MySQL tunneled via SSH to RDS (`SshTunnelConfig` opens a local tunnel on port 13306). Run with `--spring.profiles.active=dev`.
+- **prod profile**: direct RDS connection via env vars (`${DB_URL}`, `${DB_USERNAME}`, etc.).
+- `ddl-auto: update` on dev, `validate` on prod.
+- `Member` uses `@SQLRestriction("deleted_at IS NULL")` for soft delete — always query through the repository (never raw JPQL that bypasses this filter). Soft delete via `Member.softDelete()` only; never call `memberRepository.delete()` directly.
+- `MedicationRecord` has a unique constraint on `(medicine_id, recorded_at)`.
+
+## MQTT
+
+`MqttPublisher` sends commands to the ESP32 device. Topic patterns are defined in `DeviceTopic`:
+- `device/{deviceToken}/command/open-all`
+- `device/{deviceToken}/command/close-all`
+- `device/{deviceToken}/command/schedule-updated`
+
+Device token (`UUID`) is auto-generated on `Device.create()` and never rotated.
+
+## SMS (Phone Verification)
+
+`SmsService` has two implementations: `CoolSmsService` (prod, via CoolSMS SDK) and `MockSmsService` (dev, logs the code instead of sending). Verification codes are stored in Redis with TTL via `PhoneVerificationRepository`.
+
+## Public paths (no JWT required)
+
+`/api/auth/**` signup/login/check-id/find-id/password/reissue/phone/*, `/actuator/health`, `/api/health`, Swagger routes, and the device-only paths.
+
+## CQRS Split
+
+Services are split into `*CommandService` (writes, `@Transactional`) and `*QueryService` (reads, `@Transactional(readOnly = true)`). Complex queries live in `*QueryRepository` classes (JPQL / QueryDSL) alongside simple Spring Data JPA repositories.
+
+---
+
 ## Project Overview
 
 This is a backend server project.
@@ -89,11 +177,11 @@ The assistant should prioritize consistency with the existing codebase over intr
 
 - Follow RESTful principles.
 - Use proper HTTP methods:
-    - GET: read
-    - POST: create/action
-    - PATCH: partial update
-    - PUT: full update
-    - DELETE: delete
+  - GET: read
+  - POST: create/action
+  - PATCH: partial update
+  - PUT: full update
+  - DELETE: delete
 - Maintain consistent response structure.
 - Use pagination for list endpoints.
 
