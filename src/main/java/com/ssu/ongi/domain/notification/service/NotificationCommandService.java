@@ -19,10 +19,10 @@ public class NotificationCommandService {
 
     private final FcmService fcmService;
 
-    public boolean sendMedicationTaken(MedicationTakenEvent event) {
+    public void sendMedicationTaken(MedicationTakenEvent event) {
         if (!StringUtils.hasText(event.fcmToken())) {
             log.info("[FCM] 복약 완료 알림 생략 - memberId={}, reason=no_fcm_token", event.memberId());
-            return false;
+            return;
         }
 
         FcmMessage message = new FcmMessage(
@@ -42,11 +42,9 @@ public class NotificationCommandService {
             String messageId = fcmService.send(message);
             log.info("[FCM] 복약 완료 알림 발송 성공 - memberId={}, medicineId={}, messageId={}",
                     event.memberId(), event.medicineId(), messageId);
-            return true;
         } catch (FirebaseMessagingException e) {
             log.error("[FCM] 복약 완료 알림 발송 실패 - memberId={}, medicineId={}, errorCode={}, message={}",
                     event.memberId(), event.medicineId(), e.getMessagingErrorCode(), e.getMessage());
-            return false;
         }
     }
 }
