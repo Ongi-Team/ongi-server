@@ -48,6 +48,7 @@ public class AuthCommandService {
         memberCommandService.saveMember(member);
     }
 
+    @Transactional(readOnly = true)
     public LoginStartResponse login(LoginRequest request) {
         Member member = memberQueryService.findByLoginIdWithElders(request.loginId());
         memberQueryService.validatePassword(member, request.password());
