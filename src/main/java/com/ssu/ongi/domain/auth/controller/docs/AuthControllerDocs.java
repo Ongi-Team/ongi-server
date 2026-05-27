@@ -157,6 +157,7 @@ public interface AuthControllerDocs {
 
     @Operation(summary = "로그인 2단계 - 역할 선택", description = """
             로그인 세션 토큰과 선택한 모드로 실제 JWT를 발급합니다.
+            현재 정책상 보호자 계정당 어르신은 1명이며, 응답도 elder 단일 객체로 반환합니다.
             - GUARDIAN 모드: 보호자 정보 + 어르신 정보 반환
             - ELDER 모드: 어르신 정보 반환
             """)
