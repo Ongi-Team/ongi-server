@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
 import java.time.LocalDate;
@@ -28,16 +27,14 @@ public class MedicationReminderScheduler {
     /**
      * 매분 정각에 현재 시각과 일치하는 복약 스케줄을 확인하여 알림을 발행합니다.
      * Redis SET NX로 당일 중복 발송을 방지합니다.
-     * @Transactional은 @TransactionalEventListener(AFTER_COMMIT) 바인딩에 필요합니다.
      */
     @Scheduled(cron = "0 * * * * *")
-    @Transactional
     public void sendMedicationReminders() {
         LocalTime now = LocalTime.now(clock).withSecond(0).withNano(0);
         LocalDate today = LocalDate.now(clock);
 
         medicineRepository
-                .findAllByScheduledHourAndMinuteWithElder(now.getHour(), now.getMinute())
+                .findAllByScheduledTimeWithElder(now)
                 .forEach(medicine -> publishIfNotSent(medicine, today));
     }
 

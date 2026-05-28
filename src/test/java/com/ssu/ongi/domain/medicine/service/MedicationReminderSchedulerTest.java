@@ -21,7 +21,6 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -52,7 +51,7 @@ class MedicationReminderSchedulerTest {
     @Test
     void 복약_시간이_일치하면_알림_이벤트를_발행한다() {
         Medicine medicine = createMedicine(1L, "혈압약", LocalTime.of(8, 0), "fcm-token");
-        when(medicineRepository.findAllByScheduledHourAndMinuteWithElder(8, 0))
+        when(medicineRepository.findAllByScheduledTimeWithElder(LocalTime.of(8, 0)))
                 .thenReturn(List.of(medicine));
         when(reminderRepository.markAsSentIfAbsent(1L, TODAY)).thenReturn(true);
 
@@ -71,7 +70,7 @@ class MedicationReminderSchedulerTest {
     @Test
     void 당일_이미_발송된_약은_이벤트를_발행하지_않는다() {
         Medicine medicine = createMedicine(1L, "혈압약", LocalTime.of(8, 0), "fcm-token");
-        when(medicineRepository.findAllByScheduledHourAndMinuteWithElder(8, 0))
+        when(medicineRepository.findAllByScheduledTimeWithElder(LocalTime.of(8, 0)))
                 .thenReturn(List.of(medicine));
         when(reminderRepository.markAsSentIfAbsent(1L, TODAY)).thenReturn(false);
 
@@ -82,7 +81,7 @@ class MedicationReminderSchedulerTest {
 
     @Test
     void 현재_시각에_해당하는_약이_없으면_이벤트를_발행하지_않는다() {
-        when(medicineRepository.findAllByScheduledHourAndMinuteWithElder(anyInt(), anyInt()))
+        when(medicineRepository.findAllByScheduledTimeWithElder(any(LocalTime.class)))
                 .thenReturn(List.of());
 
         scheduler.sendMedicationReminders();
@@ -94,7 +93,7 @@ class MedicationReminderSchedulerTest {
     void 여러_약이_같은_시간에_등록되어_있으면_각각_이벤트를_발행한다() {
         Medicine medicine1 = createMedicine(1L, "혈압약", LocalTime.of(8, 0), "fcm-token-1");
         Medicine medicine2 = createMedicine(2L, "당뇨약", LocalTime.of(8, 0), "fcm-token-2");
-        when(medicineRepository.findAllByScheduledHourAndMinuteWithElder(8, 0))
+        when(medicineRepository.findAllByScheduledTimeWithElder(LocalTime.of(8, 0)))
                 .thenReturn(List.of(medicine1, medicine2));
         when(reminderRepository.markAsSentIfAbsent(1L, TODAY)).thenReturn(true);
         when(reminderRepository.markAsSentIfAbsent(2L, TODAY)).thenReturn(true);

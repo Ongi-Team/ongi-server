@@ -2,6 +2,7 @@ package com.ssu.ongi.domain.notification.event;
 
 import com.ssu.ongi.domain.notification.service.NotificationCommandService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
@@ -24,9 +25,10 @@ public class NotificationEventHandler {
 
     /**
      * 복약 시간 알림 이벤트를 수신하여 FCM 알림을 전송합니다.
+     * 스케줄러는 트랜잭션 없이 이벤트를 발행하므로 @EventListener를 사용합니다.
      */
     @Async
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @EventListener
     public void handleMedicationReminder(MedicationReminderEvent event) {
         notificationCommandService.sendMedicationReminder(event);
     }
