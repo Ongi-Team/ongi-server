@@ -5,6 +5,7 @@ import com.ssu.ongi.common.response.ApiResponse;
 import com.ssu.ongi.domain.device.dto.request.DeviceRegisterRequest;
 import com.ssu.ongi.domain.device.dto.request.HeartbeatRequest;
 import com.ssu.ongi.domain.device.dto.request.MedicationStatusRequest;
+import com.ssu.ongi.domain.device.dto.response.DeviceStatusResponse;
 import com.ssu.ongi.domain.device.dto.response.RegisterDeviceResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -40,6 +41,32 @@ public interface DeviceControllerDocs {
     ResponseEntity<ApiResponse<RegisterDeviceResponse>> registerDevice(
             @AuthenticationPrincipal MemberPrincipal principal,
             @Valid @RequestBody DeviceRegisterRequest request
+    );
+
+    @Operation(summary = "디바이스 상태 조회", description = "보호자가 어르신에게 등록된 디바이스의 현재 상태를 조회합니다.")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "디바이스 상태 조회 성공",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                                    {
+                                        "isSuccess": true,
+                                        "code": "DEVICE_200",
+                                        "message": "디바이스 상태 조회에 성공했습니다.",
+                                        "data": {
+                                            "deviceId": 1,
+                                            "serialNumber": "ONGI-001",
+                                            "status": "ONLINE",
+                                            "lastSeenAt": "2026-05-28T14:30:00",
+                                            "rssi": -60,
+                                            "uptimeSec": 3600
+                                        }
+                                    }
+                                    """))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "어르신 모드 접근 불가"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "등록된 디바이스 없음")
+    })
+    ResponseEntity<ApiResponse<DeviceStatusResponse>> getDeviceStatus(
+            @AuthenticationPrincipal MemberPrincipal principal
     );
 
     @Operation(summary = "디바이스 heartbeat", description = "디바이스의 연결 상태를 업데이트합니다.")
