@@ -4,7 +4,9 @@ import com.ssu.ongi.common.properties.DeviceOfflineProperties;
 import com.ssu.ongi.domain.device.entity.Device;
 import com.ssu.ongi.domain.device.enums.DeviceStatus;
 import com.ssu.ongi.domain.device.repository.DeviceRepository;
+import com.ssu.ongi.domain.notification.event.DeviceOfflineEvent;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +23,7 @@ public class DeviceOfflineMonitorService {
     private final DeviceRepository deviceRepository;
     private final DeviceOfflineProperties properties;
     private final Clock clock;
+    private final ApplicationEventPublisher eventPublisher;
 
     /**
      * 주기적으로 디바이스 heartbeat 수신 시각을 기준으로 오프라인 상태를 갱신합니다.
@@ -38,7 +41,7 @@ public class DeviceOfflineMonitorService {
         LocalDateTime now = LocalDateTime.now(clock);
         deviceRepository.findAllWithElderAndMember()
                 .forEach(device -> resolveOfflineStatus(device, now)
-                        .ifPresent(device::updateStatus));
+                        .ifPresent(status -> updateStatusAndPublishEvent(device, status)));
     }
 
     /**
@@ -57,5 +60,23 @@ public class DeviceOfflineMonitorService {
             return Optional.of(DeviceStatus.TEMP_OFFLINE);
         }
         return Optional.empty();
+    }
+
+    /**
+     * 상태가 실제 변경된 경우에만 오프라인 알림 이벤트를 발행합니다.
+     */
+    private void updateStatusAndPublishEvent(Device device, DeviceStatus status) {
+        if (!device.updateStatus(status)) {
+            return;
+        }
+
+        eventPublisher.publishEvent(new DeviceOfflineEvent(
+                device.getElder().getMember().getId(),
+                device.getElder().getId(),
+                device.getId(),
+                device.getElder().getMember().getFcmToken(),
+                status,
+                device.getLastSeenAt()
+        ));
     }
 }
