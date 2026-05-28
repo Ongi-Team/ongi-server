@@ -85,8 +85,8 @@ public class NotificationCommandService {
      */
     private void sendFcmWithRetry(FcmMessage message, String logContext) {
         try {
-            fcmService.send(message);
-            log.info("[FCM] 전송 성공 - {}", logContext);
+            String messageId = fcmService.send(message);
+            log.info("[FCM] 전송 성공 - {} messageId={}", logContext, messageId);
             return;
         } catch (FirebaseMessagingException e) {
             if (isInvalidToken(e)) {
@@ -101,8 +101,8 @@ public class NotificationCommandService {
 
         // 1회 재시도 (일시적 오류인 경우)
         try {
-            fcmService.send(message);
-            log.info("[FCM] 재시도 전송 성공 - {}", logContext);
+            String messageId = fcmService.send(message);
+            log.info("[FCM] 재시도 전송 성공 - {} messageId={}", logContext, messageId);
         } catch (FirebaseMessagingException e) {
             if (isInvalidToken(e)) {
                 log.warn("[FCM] 재시도 중 무효 토큰 감지, 토큰 삭제 - {}", logContext);
