@@ -129,7 +129,7 @@ public class DeviceCommandService {
     }
 
     private void validateDeviceNotRegistered(Long elderId, String serialNumber) {
-        if (deviceRepository.existsBySerialNumber(serialNumber) || deviceRepository.existsByElderId(elderId)) {
+        if (deviceRepository.existsBySerialNumberOrElderId(serialNumber, elderId)) {
             throw new GeneralException(ErrorStatus.DEVICE_ALREADY_REGISTERED);
         }
     }

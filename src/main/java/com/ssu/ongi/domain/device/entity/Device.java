@@ -13,7 +13,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "device")
+@Table(
+        name = "device",
+        uniqueConstraints = @UniqueConstraint(name = "uk_device_elder", columnNames = "elder_id")
+)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Device extends BaseEntity {
