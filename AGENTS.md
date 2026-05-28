@@ -34,6 +34,10 @@
     - `./gradlew build`
 - If full tests fail because local infrastructure such as PostgreSQL or Redis is unavailable, report that clearly and distinguish it from failures caused by the code change.
 
+## Commit
+- Use Korean commit messages in the format `type: 한글 메시지`.
+- Example: `feat: 디바이스 중복 등록 방지`
+
 ## Editing Rules
 - Never revert or overwrite user changes unless explicitly requested.
 - Keep changes narrowly scoped to the requested task.

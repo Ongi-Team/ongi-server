@@ -49,6 +49,7 @@ public class DeviceCommandService {
      */
     public RegisterDeviceResponse registerDevice(Long memberId, LoginMode loginMode, DeviceRegisterRequest request) {
         Elder elder = getGuardianElder(memberId, loginMode);
+        validateDeviceNotRegistered(elder.getId(), request.serialNumber());
         Device device = Device.create(elder, request.serialNumber());
         deviceRepository.save(device);
         return RegisterDeviceResponse.from(device);
@@ -125,6 +126,12 @@ public class DeviceCommandService {
     private Elder getGuardianElder(Long memberId, LoginMode loginMode) {
         validateGuardianOnly(loginMode);
         return elderQueryService.getElderByMemberId(memberId);
+    }
+
+    private void validateDeviceNotRegistered(Long elderId, String serialNumber) {
+        if (deviceRepository.existsBySerialNumberOrElderId(serialNumber, elderId)) {
+            throw new GeneralException(ErrorStatus.DEVICE_ALREADY_REGISTERED);
+        }
     }
 
     /**

@@ -13,7 +13,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "device")
+@Table(
+        name = "device",
+        uniqueConstraints = @UniqueConstraint(name = "uk_device_elder", columnNames = "elder_id")
+)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Device extends BaseEntity {
@@ -27,7 +30,7 @@ public class Device extends BaseEntity {
     @JoinColumn(name = "elder_id", nullable = false)
     private Elder elder;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String serialNumber;
 
     @Column(nullable = false, unique = true)
