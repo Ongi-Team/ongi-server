@@ -23,6 +23,15 @@ public class NotificationEventHandler {
     }
 
     /**
+     * 복약 시간 알림 이벤트를 수신하여 FCM 알림을 전송합니다.
+     */
+    @Async
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void handleMedicationReminder(MedicationReminderEvent event) {
+        notificationCommandService.sendMedicationReminder(event);
+    }
+
+    /**
      * 디바이스 오프라인 이벤트를 수신하여 FCM 알림을 전송합니다.
      */
     @Async

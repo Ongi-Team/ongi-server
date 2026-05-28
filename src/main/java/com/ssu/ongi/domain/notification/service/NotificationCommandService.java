@@ -9,6 +9,7 @@ import com.ssu.ongi.domain.medicine.enums.MedicationResult;
 import com.ssu.ongi.domain.notification.enums.NotificationType;
 import com.ssu.ongi.domain.notification.event.DeviceOfflineEvent;
 import com.ssu.ongi.domain.notification.event.MedicationEvent;
+import com.ssu.ongi.domain.notification.event.MedicationReminderEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -49,6 +50,33 @@ public class NotificationCommandService {
 
         sendFcmWithRetry(message,
                 "memberId=" + event.memberId() + " medicineId=" + event.medicineId() + " result=" + event.result());
+    }
+
+    /**
+     * 복약 시간 알림 이벤트를 보호자에게 FCM으로 전송합니다.
+     */
+    public void sendMedicationReminder(MedicationReminderEvent event) {
+        if (!StringUtils.hasText(event.fcmToken())) {
+            log.info("[FCM] 복약 시간 알림 생략 - memberId={}, medicineId={}, reason=no_fcm_token",
+                    event.memberId(), event.medicineId());
+            return;
+        }
+
+        FcmMessage message = new FcmMessage(
+                event.fcmToken(),
+                "복약 시간 알림",
+                event.medicineName() + " 복용 시간이에요.",
+                Map.of(
+                        "type", NotificationType.MEDICATION_REMINDER.name(),
+                        "memberId", String.valueOf(event.memberId()),
+                        "elderId", String.valueOf(event.elderId()),
+                        "medicineId", String.valueOf(event.medicineId()),
+                        "scheduledTime", event.scheduledTime().toString()
+                )
+        );
+
+        sendFcmWithRetry(message,
+                "memberId=" + event.memberId() + " medicineId=" + event.medicineId());
     }
 
     /**
