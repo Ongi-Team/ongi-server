@@ -18,3 +18,10 @@ springdoc:
   swagger-ui:
     tags-sorter: alpha
     operations-sorter: method
+
+ongi:
+  device:
+    offline:
+      temporary-threshold-minutes: 5
+      long-threshold-minutes: 30
+      check-interval-ms: 60000

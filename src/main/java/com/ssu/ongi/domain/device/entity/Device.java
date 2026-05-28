@@ -70,4 +70,15 @@ public class Device extends BaseEntity {
         this.rssi = rssi;
         this.lastSeenAt = LocalDateTime.now();
     }
+
+    /**
+     * 디바이스 상태가 변경된 경우에만 상태를 갱신합니다.
+     */
+    public boolean updateStatus(DeviceStatus status) {
+        if (this.status == status) {
+            return false;
+        }
+        this.status = status;
+        return true;
+    }
 }
