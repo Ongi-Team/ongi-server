@@ -65,7 +65,7 @@ class NotificationCommandServiceTest {
     }
 
     @Test
-    void 일시_오류_발생_시_재시도_후_성공하면_토큰_정리를_호출하지_않는다() throws Exception {
+    void FirebaseMessagingException_일시_오류_발생_시_재시도_후_성공하면_토큰_정리를_호출하지_않는다() throws Exception {
         when(fcmService.send(any()))
                 .thenThrow(messagingException(null))  // 1차: 일시 오류 (errorCode=null)
                 .thenReturn("msg-id");                 // 재시도: 성공
@@ -77,7 +77,7 @@ class NotificationCommandServiceTest {
     }
 
     @Test
-    void 일시_오류_재시도_후에도_실패하면_토큰_정리를_호출하지_않는다() throws Exception {
+    void FirebaseMessagingException_재시도_후에도_실패하면_토큰_정리를_호출하지_않는다() throws Exception {
         when(fcmService.send(any()))
                 .thenThrow(messagingException(null))  // 1차: 일시 오류
                 .thenThrow(messagingException(null)); // 재시도: 또 일시 오류
@@ -85,6 +85,17 @@ class NotificationCommandServiceTest {
         notificationCommandService.sendMedicationAlert(medicationEvent());
 
         verify(fcmService, times(2)).send(any());
+        verify(fcmTokenCleanupService, never()).deleteByToken(any());
+    }
+
+    @Test
+    void 일반_Exception_발생_시_재시도_없이_종료한다() throws Exception {
+        when(fcmService.send(any())).thenThrow(new RuntimeException("네트워크 오류"));
+
+        notificationCommandService.sendMedicationAlert(medicationEvent());
+
+        // RuntimeException은 재시도하지 않으므로 1회만 호출
+        verify(fcmService, times(1)).send(any());
         verify(fcmTokenCleanupService, never()).deleteByToken(any());
     }
 

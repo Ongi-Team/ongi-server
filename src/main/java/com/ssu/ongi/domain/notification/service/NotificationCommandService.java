@@ -80,14 +80,15 @@ public class NotificationCommandService {
     }
 
     /**
-     * FCM 메시지를 전송합니다. 일시적 오류 발생 시 1회 재시도하고,
-     * 무효 토큰 오류(UNREGISTERED/INVALID_ARGUMENT)이면 재시도 없이 DB에서 토큰을 삭제합니다.
+     * FCM 메시지를 전송합니다.
+     * - 무효 토큰 오류(UNREGISTERED/INVALID_ARGUMENT): 재시도 없이 DB에서 토큰 삭제
+     * - 일시적 FCM 오류(FirebaseMessagingException): 1회 재시도
+     * - 그 외 예외(프로그래밍 오류 등): 재시도 없이 에러 로그만 기록
      */
     private void sendFcmWithRetry(FcmMessage message, String logContext) {
         try {
             String messageId = fcmService.send(message);
             log.info("[FCM] 전송 성공 - {} messageId={}", logContext, messageId);
-            return;
         } catch (FirebaseMessagingException e) {
             if (isInvalidToken(e)) {
                 log.warn("[FCM] 무효 토큰 감지, 토큰 삭제 - {}", logContext);
@@ -95,11 +96,15 @@ public class NotificationCommandService {
                 return;
             }
             log.warn("[FCM] 1차 전송 실패, 재시도 - {} errorCode={}", logContext, e.getMessagingErrorCode());
+            retrySend(message, logContext);
         } catch (Exception e) {
-            log.warn("[FCM] 1차 전송 중 예외 발생, 재시도 - {} message={}", logContext, e.getMessage());
+            // NPE, IllegalArgumentException 등 프로그래밍 오류는 재시도해도 동일하게 실패하므로 재시도하지 않음
+            log.error("[FCM] 전송 중 예외 발생 (재시도 안 함) - {} message={}", logContext, e.getMessage());
         }
+    }
 
-        // 1회 재시도 (일시적 오류인 경우)
+    /** 1차 전송 실패(일시적 FCM 오류) 후 재시도합니다. */
+    private void retrySend(FcmMessage message, String logContext) {
         try {
             String messageId = fcmService.send(message);
             log.info("[FCM] 재시도 전송 성공 - {} messageId={}", logContext, messageId);
