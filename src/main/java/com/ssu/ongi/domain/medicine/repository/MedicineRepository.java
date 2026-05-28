@@ -20,4 +20,19 @@ public interface MedicineRepository extends JpaRepository<Medicine, Long> {
     @Modifying(clearAutomatically = true)
     @Query("DELETE FROM Medicine m WHERE m.elder.id = :elderId")
     void deleteAllByElderId(@Param("elderId") Long elderId);
+
+    /**
+     * 복약 시간의 시·분이 일치하는 약을 어르신·보호자 정보와 함께 조회합니다.
+     * 매분 실행되는 복약 알림 스케줄러에서 사용합니다.
+     */
+    @Query("""
+            SELECT m FROM Medicine m
+            JOIN FETCH m.elder e
+            JOIN FETCH e.member
+            WHERE HOUR(m.scheduledTime) = :hour
+            AND MINUTE(m.scheduledTime) = :minute
+            """)
+    List<Medicine> findAllByScheduledHourAndMinuteWithElder(
+            @Param("hour") int hour,
+            @Param("minute") int minute);
 }
