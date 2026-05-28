@@ -7,12 +7,15 @@ import com.ssu.ongi.domain.device.controller.docs.DeviceControllerDocs;
 import com.ssu.ongi.domain.device.dto.request.DeviceRegisterRequest;
 import com.ssu.ongi.domain.device.dto.request.HeartbeatRequest;
 import com.ssu.ongi.domain.device.dto.request.MedicationStatusRequest;
+import com.ssu.ongi.domain.device.dto.response.DeviceStatusResponse;
 import com.ssu.ongi.domain.device.dto.response.RegisterDeviceResponse;
 import com.ssu.ongi.domain.device.service.DeviceCommandService;
+import com.ssu.ongi.domain.device.service.DeviceQueryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class DeviceController implements DeviceControllerDocs {
 
     private final DeviceCommandService deviceCommandService;
+    private final DeviceQueryService deviceQueryService;
 
     @Override
     @PostMapping("")
@@ -34,6 +38,18 @@ public class DeviceController implements DeviceControllerDocs {
     ) {
         RegisterDeviceResponse response = deviceCommandService.registerDevice(principal.memberId(), principal.loginMode(), request);
         return ApiResponse.success(SuccessStatus.DEVICE_REGISTER_SUCCESS, response);
+    }
+
+    /**
+     * 로그인한 보호자의 어르신에게 등록된 디바이스 상태를 조회합니다.
+     */
+    @Override
+    @GetMapping("/status")
+    public ResponseEntity<ApiResponse<DeviceStatusResponse>> getDeviceStatus(
+            @AuthenticationPrincipal MemberPrincipal principal
+    ) {
+        DeviceStatusResponse response = deviceQueryService.getDeviceStatus(principal.memberId(), principal.loginMode());
+        return ApiResponse.success(SuccessStatus.DEVICE_STATUS_GET_SUCCESS, response);
     }
 
     @Override

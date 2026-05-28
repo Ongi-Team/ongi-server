@@ -11,6 +11,7 @@ import com.ssu.ongi.domain.elder.entity.Elder;
 import com.ssu.ongi.domain.elder.service.ElderQueryService;
 import com.ssu.ongi.domain.medicine.service.MedicationRecordCommandService;
 import com.ssu.ongi.domain.member.enums.LoginMode;
+import com.ssu.ongi.domain.member.service.LoginModeValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationEventPublisher;
@@ -41,7 +42,8 @@ class DeviceCommandServiceTest {
                 mock(MqttPublisher.class),
                 mock(DeviceSlotCommandService.class),
                 mock(MedicationRecordCommandService.class),
-                mock(ApplicationEventPublisher.class)
+                mock(ApplicationEventPublisher.class),
+                new LoginModeValidator()
         );
     }
 

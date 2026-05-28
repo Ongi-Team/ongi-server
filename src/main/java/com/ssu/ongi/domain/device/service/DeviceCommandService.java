@@ -18,6 +18,7 @@ import com.ssu.ongi.domain.medicine.entity.MedicationRecord;
 import com.ssu.ongi.domain.medicine.enums.MedicationResult;
 import com.ssu.ongi.domain.medicine.service.MedicationRecordCommandService;
 import com.ssu.ongi.domain.member.enums.LoginMode;
+import com.ssu.ongi.domain.member.service.LoginModeValidator;
 import com.ssu.ongi.domain.notification.event.MedicationTakenEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,6 +44,7 @@ public class DeviceCommandService {
     private final DeviceSlotCommandService deviceSlotCommandService;
     private final MedicationRecordCommandService medicationRecordCommandService;
     private final ApplicationEventPublisher eventPublisher;
+    private final LoginModeValidator loginModeValidator;
 
     /**
      * 보호자의 어르신에게 디바이스를 등록하고 deviceToken을 발급합니다.
@@ -124,7 +126,7 @@ public class DeviceCommandService {
      * 보호자 모드 검증 후 어르신 정보를 반환합니다.
      */
     private Elder getGuardianElder(Long memberId, LoginMode loginMode) {
-        validateGuardianOnly(loginMode);
+        loginModeValidator.validateGuardianOnly(loginMode);
         return elderQueryService.getElderByMemberId(memberId);
     }
 
@@ -134,12 +136,4 @@ public class DeviceCommandService {
         }
     }
 
-    /**
-     * 어르신 모드인 경우 접근을 차단합니다.
-     */
-    private void validateGuardianOnly(LoginMode loginMode) {
-        if (loginMode == LoginMode.ELDER) {
-            throw new GeneralException(ErrorStatus.ELDER_CANNOT_ACCESS);
-        }
-    }
 }
