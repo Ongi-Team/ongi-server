@@ -14,12 +14,11 @@ import com.ssu.ongi.domain.device.enums.SlotStatus;
 import com.ssu.ongi.domain.device.repository.DeviceRepository;
 import com.ssu.ongi.domain.elder.entity.Elder;
 import com.ssu.ongi.domain.elder.service.ElderQueryService;
-import com.ssu.ongi.domain.medicine.entity.MedicationRecord;
 import com.ssu.ongi.domain.medicine.enums.MedicationResult;
 import com.ssu.ongi.domain.medicine.service.MedicationRecordCommandService;
 import com.ssu.ongi.domain.member.enums.LoginMode;
 import com.ssu.ongi.domain.member.service.LoginModeValidator;
-import com.ssu.ongi.domain.notification.event.MedicationTakenEvent;
+import com.ssu.ongi.domain.notification.event.MedicationEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -28,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -84,32 +82,37 @@ public class DeviceCommandService {
     }
 
     /**
-     * 디바이스로부터 복약 상태를 수신하여 슬롯 상태를 업데이트합니다.
+     * 디바이스로부터 복약 상태를 수신하여 슬롯 상태를 업데이트하고 알림 이벤트를 발행합니다.
      */
     public void updateMedicationStatus(Long deviceId, MedicationStatusRequest request) {
         DeviceSlot deviceSlot = deviceSlotCommandService.updateMedicationStatus(
                 deviceId, request.slotNumber(), request.status()
         );
 
-        if (request.status() != SlotStatus.TAKEN) {
-            return;
-        }
+        MedicationResult result = toMedicationResult(request.status());
+        if (result == null) return;
 
         LocalDateTime recordedAt = LocalDateTime.now(clock);
-        Optional<MedicationRecord> medicationRecord = medicationRecordCommandService.saveMedicationIntake(
-                deviceSlot,
-                MedicationResult.TAKEN,
-                recordedAt
-        );
+        medicationRecordCommandService.saveMedicationIntake(deviceSlot, result, recordedAt)
+                .ifPresent(record -> eventPublisher.publishEvent(new MedicationEvent(
+                        result,
+                        deviceSlot.getElder().getMember().getId(),
+                        deviceSlot.getElder().getId(),
+                        deviceSlot.getMedicine().getId(),
+                        deviceSlot.getElder().getMember().getFcmToken(),
+                        deviceSlot.getMedicine().getName(),
+                        recordedAt
+                )));
+    }
 
-        medicationRecord.ifPresent(record -> eventPublisher.publishEvent(new MedicationTakenEvent(
-                deviceSlot.getElder().getMember().getId(),
-                deviceSlot.getElder().getId(),
-                deviceSlot.getMedicine().getId(),
-                deviceSlot.getElder().getMember().getFcmToken(),
-                deviceSlot.getMedicine().getName(),
-                recordedAt
-        )));
+    /**
+     * SlotStatus를 MedicationResult로 변환합니다. 알림 대상이 아닌 상태는 null을 반환합니다.
+     */
+    private MedicationResult toMedicationResult(SlotStatus status) {
+        return switch (status) {
+            case TAKEN  -> MedicationResult.TAKEN;
+            case MISSED -> MedicationResult.MISSED;
+        };
     }
 
     /**
