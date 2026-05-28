@@ -27,7 +27,7 @@ public class Device extends BaseEntity {
     @JoinColumn(name = "elder_id", nullable = false)
     private Elder elder;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String serialNumber;
 
     @Column(nullable = false, unique = true)
