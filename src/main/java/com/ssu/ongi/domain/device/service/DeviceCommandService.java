@@ -124,7 +124,7 @@ public class DeviceCommandService {
      * 보호자 모드 검증 후 어르신 정보를 반환합니다.
      */
     private Elder getGuardianElder(Long memberId, LoginMode loginMode) {
-        validateGuardianOnly(loginMode);
+        loginMode.validateGuardianOnly();
         return elderQueryService.getElderByMemberId(memberId);
     }
 
@@ -134,12 +134,4 @@ public class DeviceCommandService {
         }
     }
 
-    /**
-     * 어르신 모드인 경우 접근을 차단합니다.
-     */
-    private void validateGuardianOnly(LoginMode loginMode) {
-        if (loginMode == LoginMode.ELDER) {
-            throw new GeneralException(ErrorStatus.ELDER_CANNOT_ACCESS);
-        }
-    }
 }

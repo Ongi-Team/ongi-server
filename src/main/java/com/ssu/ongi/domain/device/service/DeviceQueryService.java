@@ -40,18 +40,9 @@ public class DeviceQueryService {
      * 보호자의 어르신에게 등록된 디바이스 상태를 조회합니다.
      */
     public DeviceStatusResponse getDeviceStatus(Long memberId, LoginMode loginMode) {
-        validateGuardianOnly(loginMode);
+        loginMode.validateGuardianOnly();
         Elder elder = elderQueryService.getElderByMemberId(memberId);
         Device device = getDeviceByElderId(elder.getId());
         return DeviceStatusResponse.from(device);
-    }
-
-    /**
-     * 어르신 모드인 경우 접근을 차단합니다.
-     */
-    private void validateGuardianOnly(LoginMode loginMode) {
-        if (loginMode == LoginMode.ELDER) {
-            throw new GeneralException(ErrorStatus.ELDER_CANNOT_ACCESS);
-        }
     }
 }
