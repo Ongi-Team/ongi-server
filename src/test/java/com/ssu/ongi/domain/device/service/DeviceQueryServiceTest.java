@@ -9,6 +9,7 @@ import com.ssu.ongi.domain.device.repository.DeviceRepository;
 import com.ssu.ongi.domain.elder.entity.Elder;
 import com.ssu.ongi.domain.elder.service.ElderQueryService;
 import com.ssu.ongi.domain.member.enums.LoginMode;
+import com.ssu.ongi.domain.member.service.LoginModeValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -32,7 +33,7 @@ class DeviceQueryServiceTest {
     void setUp() {
         deviceRepository = mock(DeviceRepository.class);
         elderQueryService = mock(ElderQueryService.class);
-        deviceQueryService = new DeviceQueryService(deviceRepository, elderQueryService);
+        deviceQueryService = new DeviceQueryService(deviceRepository, elderQueryService, new LoginModeValidator());
     }
 
     /**

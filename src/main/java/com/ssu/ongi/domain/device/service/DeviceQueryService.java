@@ -8,6 +8,7 @@ import com.ssu.ongi.domain.device.repository.DeviceRepository;
 import com.ssu.ongi.domain.elder.entity.Elder;
 import com.ssu.ongi.domain.elder.service.ElderQueryService;
 import com.ssu.ongi.domain.member.enums.LoginMode;
+import com.ssu.ongi.domain.member.service.LoginModeValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +20,7 @@ public class DeviceQueryService {
 
     private final DeviceRepository deviceRepository;
     private final ElderQueryService elderQueryService;
+    private final LoginModeValidator loginModeValidator;
 
     /**
      * deviceToken으로 디바이스를 조회합니다. (ESP32 인증 시 사용)
@@ -40,7 +42,7 @@ public class DeviceQueryService {
      * 보호자의 어르신에게 등록된 디바이스 상태를 조회합니다.
      */
     public DeviceStatusResponse getDeviceStatus(Long memberId, LoginMode loginMode) {
-        loginMode.validateGuardianOnly();
+        loginModeValidator.validateGuardianOnly(loginMode);
         Elder elder = elderQueryService.getElderByMemberId(memberId);
         Device device = getDeviceByElderId(elder.getId());
         return DeviceStatusResponse.from(device);
