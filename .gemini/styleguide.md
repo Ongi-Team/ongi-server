@@ -1,7 +1,8 @@
 # Gemini Code Assist Review Guide
 
 ## Language
-- Always write review comments in Korean.
+- Always write review comments in Korean (UTF-8 encoded).
+- Use standard Korean characters only. Do not use any special encoding or transliteration.
 - Keep comments direct, practical, and specific to the current codebase.
 
 ## Review Priority
