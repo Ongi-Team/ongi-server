@@ -47,7 +47,8 @@ public interface DeviceControllerDocs {
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "디바이스 상태 조회 성공",
                     content = @Content(mediaType = "application/json",
-                            examples = @ExampleObject(value = """
+                            examples = {
+                                    @ExampleObject(name = "연결된 디바이스", value = """
                                     {
                                         "isSuccess": true,
                                         "code": "DEVICE_200",
@@ -61,7 +62,23 @@ public interface DeviceControllerDocs {
                                             "uptimeSec": 3600
                                         }
                                     }
-                                    """))),
+                                    """),
+                                    @ExampleObject(name = "미연결 디바이스", value = """
+                                    {
+                                        "isSuccess": true,
+                                        "code": "DEVICE_200",
+                                        "message": "디바이스 상태 조회에 성공했습니다.",
+                                        "data": {
+                                            "deviceId": 1,
+                                            "serialNumber": "ONGI-001",
+                                            "status": null,
+                                            "lastSeenAt": null,
+                                            "rssi": null,
+                                            "uptimeSec": null
+                                        }
+                                    }
+                                    """)
+                            })),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "403", description = "어르신 모드 접근 불가"),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "등록된 디바이스 없음")
     })

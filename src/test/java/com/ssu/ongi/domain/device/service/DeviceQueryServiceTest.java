@@ -57,6 +57,28 @@ class DeviceQueryServiceTest {
     }
 
     /**
+     * 최초 heartbeat 전 디바이스는 연결 상태 필드가 null로 조회되는지 검증합니다.
+     */
+    @Test
+    void 한번도_연결되지_않은_디바이스는_null_필드로_응답한다() {
+        Elder elder = createElder(1L);
+        Device device = Device.create(elder, "ONGI-001");
+        ReflectionTestUtils.setField(device, "id", 10L);
+
+        when(elderQueryService.getElderByMemberId(1L)).thenReturn(elder);
+        when(deviceRepository.findByElderId(1L)).thenReturn(Optional.of(device));
+
+        DeviceStatusResponse response = deviceQueryService.getDeviceStatus(1L, LoginMode.GUARDIAN);
+
+        assertThat(response.deviceId()).isEqualTo(10L);
+        assertThat(response.serialNumber()).isEqualTo("ONGI-001");
+        assertThat(response.status()).isNull();
+        assertThat(response.lastSeenAt()).isNull();
+        assertThat(response.rssi()).isNull();
+        assertThat(response.uptimeSec()).isNull();
+    }
+
+    /**
      * 등록된 디바이스가 없으면 404 예외가 발생하는지 검증합니다.
      */
     @Test
