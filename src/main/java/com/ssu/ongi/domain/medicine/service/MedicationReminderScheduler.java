@@ -27,10 +27,11 @@ public class MedicationReminderScheduler {
 
     /**
      * 매분 정각에 현재 시각과 일치하는 복약 스케줄을 확인하여 알림을 발행합니다.
-     * Redis로 당일 중복 발송을 방지합니다.
+     * Redis SET NX로 당일 중복 발송을 방지합니다.
+     * @Transactional은 @TransactionalEventListener(AFTER_COMMIT) 바인딩에 필요합니다.
      */
     @Scheduled(cron = "0 * * * * *")
-    @Transactional(readOnly = true)
+    @Transactional
     public void sendMedicationReminders() {
         LocalTime now = LocalTime.now(clock).withSecond(0).withNano(0);
         LocalDate today = LocalDate.now(clock);
@@ -41,15 +42,13 @@ public class MedicationReminderScheduler {
     }
 
     /**
-     * 당일 미발송 약에 한해 Redis에 발송 이력을 기록하고 알림 이벤트를 발행합니다.
+     * SET NX로 원자적으로 중복 체크 후 미발송 약에 한해 알림 이벤트를 발행합니다.
      */
     private void publishIfNotSent(Medicine medicine, LocalDate today) {
-        if (reminderRepository.isAlreadySent(medicine.getId(), today)) {
+        if (!reminderRepository.markAsSentIfAbsent(medicine.getId(), today)) {
             log.debug("[복약 알림] 오늘 이미 발송 완료 - medicineId={}", medicine.getId());
             return;
         }
-
-        reminderRepository.markAsSent(medicine.getId(), today);
 
         eventPublisher.publishEvent(new MedicationReminderEvent(
                 medicine.getElder().getMember().getId(),

@@ -54,14 +54,13 @@ class MedicationReminderSchedulerTest {
         Medicine medicine = createMedicine(1L, "혈압약", LocalTime.of(8, 0), "fcm-token");
         when(medicineRepository.findAllByScheduledHourAndMinuteWithElder(8, 0))
                 .thenReturn(List.of(medicine));
-        when(reminderRepository.isAlreadySent(1L, TODAY)).thenReturn(false);
+        when(reminderRepository.markAsSentIfAbsent(1L, TODAY)).thenReturn(true);
 
         scheduler.sendMedicationReminders();
 
         ArgumentCaptor<MedicationReminderEvent> captor =
                 ArgumentCaptor.forClass(MedicationReminderEvent.class);
         verify(eventPublisher).publishEvent(captor.capture());
-        verify(reminderRepository).markAsSent(1L, TODAY);
 
         MedicationReminderEvent event = captor.getValue();
         assertThat(event.medicineName()).isEqualTo("혈압약");
@@ -74,12 +73,11 @@ class MedicationReminderSchedulerTest {
         Medicine medicine = createMedicine(1L, "혈압약", LocalTime.of(8, 0), "fcm-token");
         when(medicineRepository.findAllByScheduledHourAndMinuteWithElder(8, 0))
                 .thenReturn(List.of(medicine));
-        when(reminderRepository.isAlreadySent(1L, TODAY)).thenReturn(true);
+        when(reminderRepository.markAsSentIfAbsent(1L, TODAY)).thenReturn(false);
 
         scheduler.sendMedicationReminders();
 
         verify(eventPublisher, never()).publishEvent(any());
-        verify(reminderRepository, never()).markAsSent(any(), any());
     }
 
     @Test
@@ -98,8 +96,8 @@ class MedicationReminderSchedulerTest {
         Medicine medicine2 = createMedicine(2L, "당뇨약", LocalTime.of(8, 0), "fcm-token-2");
         when(medicineRepository.findAllByScheduledHourAndMinuteWithElder(8, 0))
                 .thenReturn(List.of(medicine1, medicine2));
-        when(reminderRepository.isAlreadySent(1L, TODAY)).thenReturn(false);
-        when(reminderRepository.isAlreadySent(2L, TODAY)).thenReturn(false);
+        when(reminderRepository.markAsSentIfAbsent(1L, TODAY)).thenReturn(true);
+        when(reminderRepository.markAsSentIfAbsent(2L, TODAY)).thenReturn(true);
 
         scheduler.sendMedicationReminders();
 

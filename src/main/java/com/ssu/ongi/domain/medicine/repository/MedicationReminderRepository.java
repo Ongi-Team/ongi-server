@@ -20,17 +20,15 @@ public class MedicationReminderRepository {
 
     private final RedisTemplate<String, String> redisTemplate;
 
-    /** 오늘 해당 약의 알림이 이미 발송되었는지 확인합니다. */
-    public boolean isAlreadySent(Long medicineId, LocalDate date) {
-        return Boolean.TRUE.equals(
-                redisTemplate.hasKey(buildKey(medicineId, date))
-        );
-    }
-
-    /** 오늘 해당 약의 알림 발송 이력을 기록합니다. */
-    public void markAsSent(Long medicineId, LocalDate date) {
-        redisTemplate.opsForValue()
-                .set(buildKey(medicineId, date), "sent", TTL_HOURS, TimeUnit.HOURS);
+    /**
+     * 발송 이력이 없을 때만 원자적으로 기록하고 true를 반환합니다.
+     * SET NX를 사용해 분산 환경에서의 중복 발송 race condition을 방지합니다.
+     * 이미 발송된 경우 false를 반환합니다.
+     */
+    public boolean markAsSentIfAbsent(Long medicineId, LocalDate date) {
+        Boolean success = redisTemplate.opsForValue()
+                .setIfAbsent(buildKey(medicineId, date), "sent", TTL_HOURS, TimeUnit.HOURS);
+        return Boolean.TRUE.equals(success);
     }
 
     private String buildKey(Long medicineId, LocalDate date) {
