@@ -18,4 +18,10 @@ public class NotificationEventHandler {
     public void handleMedicationTaken(MedicationTakenEvent event) {
         notificationCommandService.sendMedicationTaken(event);
     }
+
+    @Async
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void handleDeviceOffline(DeviceOfflineEvent event) {
+        notificationCommandService.sendDeviceOffline(event);
+    }
 }

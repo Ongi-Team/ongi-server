@@ -17,6 +17,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.time.Clock;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -26,6 +32,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class DeviceCommandServiceTest {
+
+    private static final ZoneId KOREA_ZONE = ZoneId.of("Asia/Seoul");
+    private static final Clock FIXED_CLOCK = Clock.fixed(Instant.parse("2026-05-28T03:00:00Z"), KOREA_ZONE);
 
     private DeviceRepository deviceRepository;
     private ElderQueryService elderQueryService;
@@ -43,7 +52,8 @@ class DeviceCommandServiceTest {
                 mock(DeviceSlotCommandService.class),
                 mock(MedicationRecordCommandService.class),
                 mock(ApplicationEventPublisher.class),
-                new LoginModeValidator()
+                new LoginModeValidator(),
+                FIXED_CLOCK
         );
     }
 
@@ -91,6 +101,20 @@ class DeviceCommandServiceTest {
 
         assertThat(response.deviceToken()).isNotBlank();
         verify(deviceRepository).save(any(Device.class));
+    }
+
+    @Test
+    void heartbeat_수신_시_Clock_기준으로_마지막_수신_시각을_저장한다() {
+        Device device = Device.create(createElder(1L), "ONGI-001");
+        when(deviceRepository.findById(1L)).thenReturn(Optional.of(device));
+
+        deviceCommandService.updateHeartbeat(1L, new com.ssu.ongi.domain.device.dto.request.HeartbeatRequest(
+                com.ssu.ongi.domain.device.enums.DeviceStatus.ONLINE,
+                3600L,
+                -60
+        ));
+
+        assertThat(device.getLastSeenAt()).isEqualTo(LocalDateTime.now(FIXED_CLOCK));
     }
 
     private Elder createElder(Long id) {

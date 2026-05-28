@@ -26,8 +26,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Optional;
 
 @Slf4j
@@ -36,8 +36,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class DeviceCommandService {
 
-    private static final ZoneId KOREA_ZONE = ZoneId.of("Asia/Seoul");
-
     private final DeviceRepository deviceRepository;
     private final ElderQueryService elderQueryService;
     private final MqttPublisher mqttPublisher;
@@ -45,6 +43,7 @@ public class DeviceCommandService {
     private final MedicationRecordCommandService medicationRecordCommandService;
     private final ApplicationEventPublisher eventPublisher;
     private final LoginModeValidator loginModeValidator;
+    private final Clock clock;
 
     /**
      * 보호자의 어르신에게 디바이스를 등록하고 deviceToken을 발급합니다.
@@ -63,7 +62,7 @@ public class DeviceCommandService {
     public void updateHeartbeat(Long deviceId, HeartbeatRequest request) {
         Device device = deviceRepository.findById(deviceId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.DEVICE_NOT_FOUND));
-        device.updateHeartbeat(request.status(), request.uptimeSec(), request.rssi());
+        device.updateHeartbeat(request.status(), request.uptimeSec(), request.rssi(), LocalDateTime.now(clock));
         log.info("[heartbeat] deviceId={} status={} rssi={} uptime={}s",
                 deviceId, request.status(), request.rssi(), request.uptimeSec());
     }
@@ -96,7 +95,7 @@ public class DeviceCommandService {
             return;
         }
 
-        LocalDateTime recordedAt = LocalDateTime.now(KOREA_ZONE);
+        LocalDateTime recordedAt = LocalDateTime.now(clock);
         Optional<MedicationRecord> medicationRecord = medicationRecordCommandService.saveMedicationIntake(
                 deviceSlot,
                 MedicationResult.TAKEN,
