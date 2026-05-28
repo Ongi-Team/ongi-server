@@ -21,9 +21,10 @@ public class FcmTokenCleanupService {
      * UNREGISTERED/INVALID_ARGUMENT 에러 수신 시 호출됩니다.
      */
     public void deleteByToken(String token) {
-        boolean deleted = deleteMemberToken(token) || deleteElderToken(token);
+        boolean memberDeleted = deleteMemberToken(token);
+        boolean elderDeleted = deleteElderToken(token);
 
-        if (!deleted) {
+        if (!memberDeleted && !elderDeleted) {
             log.warn("[FCM] 무효 토큰 정리 대상 없음 - token={}", token);
         }
     }

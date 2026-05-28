@@ -38,8 +38,8 @@ class FcmTokenCleanupServiceTest {
 
         assertThat(member.getFcmToken()).isNull();
         assertThat(member.getOsType()).isNull();
-        // 보호자에서 찾았으므로 어르신 조회는 호출되지 않음
-        verify(elderRepository, never()).findByFcmToken("fcm-member-token");
+        // 동일 토큰이 어르신 테이블에도 있을 수 있으므로 항상 두 테이블 모두 조회
+        verify(elderRepository).findByFcmToken("fcm-member-token");
     }
 
     @Test
