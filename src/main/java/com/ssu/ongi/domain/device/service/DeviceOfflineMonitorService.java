@@ -29,7 +29,6 @@ public class DeviceOfflineMonitorService {
      * 주기적으로 디바이스 heartbeat 수신 시각을 기준으로 오프라인 상태를 갱신합니다.
      */
     @Scheduled(fixedDelayString = "${ongi.device.offline.check-interval-ms:60000}")
-    @Transactional
     public void monitorOfflineDevices() {
         updateOfflineStatuses();
     }
@@ -37,6 +36,7 @@ public class DeviceOfflineMonitorService {
     /**
      * heartbeat 수신 이력이 있는 디바이스의 lastSeenAt을 기준으로 오프라인 상태를 판별합니다.
      */
+    @Transactional
     public void updateOfflineStatuses() {
         LocalDateTime now = LocalDateTime.now(clock);
         deviceRepository.findAllConnectedDevicesWithElderAndMember()

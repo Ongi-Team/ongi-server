@@ -38,7 +38,7 @@
 ## Test Review
 - Check whether new behavior has focused tests.
 - Prefer focused tests before broad tests for narrow changes.
-- Test method names must be written in English.
+- Test method names must be written in Korean using the underscore style (e.g., `조건_이면_결과_한다`).
 - Test comments should use `given`, `when`, `then` only when comments are necessary.
 - If tests cannot be executed due to local infrastructure or existing unrelated failures, state that separately from issues caused by the PR.
 
