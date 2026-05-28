@@ -13,12 +13,18 @@ public class NotificationEventHandler {
 
     private final NotificationCommandService notificationCommandService;
 
+    /**
+     * 복약 완료/미복용 이벤트를 수신하여 FCM 알림을 전송합니다.
+     */
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handleMedicationTaken(MedicationTakenEvent event) {
-        notificationCommandService.sendMedicationTaken(event);
+    public void handleMedicationEvent(MedicationEvent event) {
+        notificationCommandService.sendMedicationAlert(event);
     }
 
+    /**
+     * 디바이스 오프라인 이벤트를 수신하여 FCM 알림을 전송합니다.
+     */
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleDeviceOffline(DeviceOfflineEvent event) {
