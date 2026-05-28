@@ -64,11 +64,11 @@ public class Device extends BaseEntity {
                 .build();
     }
 
-    public void updateHeartbeat(DeviceStatus status, Long uptimeSec, Integer rssi) {
+    public void updateHeartbeat(DeviceStatus status, Long uptimeSec, Integer rssi, LocalDateTime receivedAt) {
         this.status = status;
         this.uptimeSec = uptimeSec;
         this.rssi = rssi;
-        this.lastSeenAt = LocalDateTime.now();
+        this.lastSeenAt = receivedAt;
     }
 
     /**
