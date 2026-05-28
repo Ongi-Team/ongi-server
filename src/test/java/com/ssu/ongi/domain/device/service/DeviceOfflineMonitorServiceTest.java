@@ -52,7 +52,7 @@ class DeviceOfflineMonitorServiceTest {
     @Test
     void 일시_오프라인_기준_미만이면_상태를_변경하지_않는다() {
         Device device = createDevice(1L, DeviceStatus.ONLINE, now().minusMinutes(4));
-        when(deviceRepository.findAllWithElderAndMember()).thenReturn(List.of(device));
+        when(deviceRepository.findAllConnectedDevicesWithElderAndMember()).thenReturn(List.of(device));
 
         deviceOfflineMonitorService.updateOfflineStatuses();
 
@@ -66,7 +66,7 @@ class DeviceOfflineMonitorServiceTest {
     @Test
     void 일시_오프라인_기준_이상이면_TEMP_OFFLINE으로_변경한다() {
         Device device = createDevice(1L, DeviceStatus.ONLINE, now().minusMinutes(5));
-        when(deviceRepository.findAllWithElderAndMember()).thenReturn(List.of(device));
+        when(deviceRepository.findAllConnectedDevicesWithElderAndMember()).thenReturn(List.of(device));
 
         deviceOfflineMonitorService.updateOfflineStatuses();
 
@@ -82,7 +82,7 @@ class DeviceOfflineMonitorServiceTest {
     @Test
     void 장시간_오프라인_기준_이상이면_LONG_OFFLINE으로_변경한다() {
         Device device = createDevice(1L, DeviceStatus.TEMP_OFFLINE, now().minusMinutes(30));
-        when(deviceRepository.findAllWithElderAndMember()).thenReturn(List.of(device));
+        when(deviceRepository.findAllConnectedDevicesWithElderAndMember()).thenReturn(List.of(device));
 
         deviceOfflineMonitorService.updateOfflineStatuses();
 
@@ -93,16 +93,14 @@ class DeviceOfflineMonitorServiceTest {
     }
 
     /**
-     * 최초 heartbeat 전 디바이스는 오프라인 판별에서 제외되는지 검증합니다.
+     * repository가 조회 대상을 제한하면 최초 heartbeat 전 디바이스는 처리되지 않는지 검증합니다.
      */
     @Test
-    void 마지막_수신_시각이_없으면_상태를_변경하지_않는다() {
-        Device device = createDevice(1L, null, null);
-        when(deviceRepository.findAllWithElderAndMember()).thenReturn(List.of(device));
+    void 조회된_디바이스가_없으면_상태를_변경하지_않는다() {
+        when(deviceRepository.findAllConnectedDevicesWithElderAndMember()).thenReturn(List.of());
 
         deviceOfflineMonitorService.updateOfflineStatuses();
 
-        assertThat(device.getStatus()).isNull();
         verify(eventPublisher, never()).publishEvent(org.mockito.ArgumentMatchers.any());
     }
 
@@ -112,7 +110,7 @@ class DeviceOfflineMonitorServiceTest {
     @Test
     void 이미_같은_오프라인_상태이면_이벤트를_발행하지_않는다() {
         Device device = createDevice(1L, DeviceStatus.LONG_OFFLINE, now().minusMinutes(40));
-        when(deviceRepository.findAllWithElderAndMember()).thenReturn(List.of(device));
+        when(deviceRepository.findAllConnectedDevicesWithElderAndMember()).thenReturn(List.of(device));
 
         deviceOfflineMonitorService.updateOfflineStatuses();
 

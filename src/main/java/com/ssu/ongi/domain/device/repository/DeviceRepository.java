@@ -17,11 +17,14 @@ public interface DeviceRepository extends JpaRepository<Device, Long> {
 	Optional<Device> findByElderId(Long elderId);
 
 	/**
-	 * 오프라인 판별에 필요한 보호자 정보까지 포함해 전체 디바이스를 조회합니다.
+	 * 오프라인 판별 대상인 heartbeat 수신 이력이 있는 디바이스를 보호자 정보와 함께 조회합니다.
 	 */
 	@EntityGraph(attributePaths = {"elder", "elder.member"})
-	@Query("SELECT d FROM Device d")
-	List<Device> findAllWithElderAndMember();
+	@Query("""
+			SELECT d FROM Device d
+			WHERE d.lastSeenAt IS NOT NULL
+			""")
+	List<Device> findAllConnectedDevicesWithElderAndMember();
 
 	@Query("""
 			SELECT COUNT(d) > 0

@@ -35,11 +35,11 @@ public class DeviceOfflineMonitorService {
     }
 
     /**
-     * 전체 디바이스의 lastSeenAt을 기준으로 오프라인 상태를 판별합니다.
+     * heartbeat 수신 이력이 있는 디바이스의 lastSeenAt을 기준으로 오프라인 상태를 판별합니다.
      */
     public void updateOfflineStatuses() {
         LocalDateTime now = LocalDateTime.now(clock);
-        deviceRepository.findAllWithElderAndMember()
+        deviceRepository.findAllConnectedDevicesWithElderAndMember()
                 .forEach(device -> resolveOfflineStatus(device, now)
                         .ifPresent(status -> updateStatusAndPublishEvent(device, status)));
     }
@@ -48,10 +48,6 @@ public class DeviceOfflineMonitorService {
      * 마지막 heartbeat 이후 경과 시간으로 변경할 오프라인 상태를 계산합니다.
      */
     private Optional<DeviceStatus> resolveOfflineStatus(Device device, LocalDateTime now) {
-        if (device.getLastSeenAt() == null) {
-            return Optional.empty();
-        }
-
         Duration elapsed = Duration.between(device.getLastSeenAt(), now);
         if (elapsed.toMinutes() >= properties.longThresholdMinutes()) {
             return Optional.of(DeviceStatus.LONG_OFFLINE);
