@@ -20,7 +20,7 @@ public class JacksonConfig {
     @Bean
     public Jackson2ObjectMapperBuilderCustomizer jacksonCustomizer() {
         return builder -> builder
-                .modules(new ParameterNamesModule(), new JavaTimeModule())
+                .modulesToInstall(new ParameterNamesModule(), new JavaTimeModule())
                 .serializerByType(LocalTime.class, new LocalTimeSerializer(TIME_FORMATTER))
                 .deserializerByType(LocalTime.class, new LocalTimeDeserializer(TIME_FORMATTER))
                 .featuresToDisable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
