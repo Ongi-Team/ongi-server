@@ -83,9 +83,6 @@ public class AuthCommandService {
     }
 
     public void logout(Long memberId, LoginMode loginMode) {
-        if (loginMode == LoginMode.ELDER) {
-            throw new GeneralException(ErrorStatus.ELDER_CANNOT_LOGOUT);
-        }
         tokenCommandService.logout(memberId);
         memberCommandService.deleteFcmToken(memberId);
         elderCommandService.deleteFcmToken(memberId);
