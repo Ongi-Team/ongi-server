@@ -50,12 +50,6 @@ public class SecurityConfig {
             "/api/health"
     };
 
-    // ESP32 전용 경로 — JWT 없이 Device-Token 헤더로 인증
-    private static final String[] DEVICE_ONLY_URIS = {
-            "/api/device/heartbeat",
-            "/api/device/schedules",
-            "/api/device/medication-status"
-    };
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -67,7 +61,7 @@ public class SecurityConfig {
                         .requestMatchers(SWAGGER_URIS).permitAll()
                         .requestMatchers(AUTH_URIS).permitAll()
                         .requestMatchers(HEALTH_URIS).permitAll()
-                        .requestMatchers(DEVICE_ONLY_URIS).permitAll()
+                        .requestMatchers(DeviceAuthFilter.DEVICE_ONLY_PATHS.toArray(String[]::new)).permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
