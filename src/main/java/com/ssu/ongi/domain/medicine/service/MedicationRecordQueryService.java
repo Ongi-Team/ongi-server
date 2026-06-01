@@ -8,6 +8,7 @@ import com.ssu.ongi.domain.elder.service.ElderQueryService;
 import com.ssu.ongi.domain.medicine.dto.response.DailyMedicationStatusResponse;
 import com.ssu.ongi.domain.medicine.dto.response.MedicationIntakeResponse;
 import com.ssu.ongi.domain.medicine.entity.MedicationRecord;
+import com.ssu.ongi.domain.medicine.entity.Medicine;
 import com.ssu.ongi.domain.medicine.repository.MedicationRecordRepository;
 import com.ssu.ongi.domain.medicine.repository.MedicineRepository;
 import lombok.RequiredArgsConstructor;
@@ -67,10 +68,19 @@ public class MedicationRecordQueryService {
                 ));
         Map<Long, DeviceSlot> slotMap = deviceSlotQueryService.getSlotMapByElderId(elderId);
 
-        return medicineRepository.findAllByElderIdOrderByScheduledTimeAsc(elderId)
-                .stream()
+        List<Medicine> medicines = medicineRepository.findAllByElderIdOrderByScheduledTimeAsc(elderId);
+
+        medicines.forEach(medicine -> validateDeviceSlotExists(slotMap, medicine.getId()));
+
+        return medicines.stream()
                 .map(medicine -> DailyMedicationStatusResponse.of(
                         medicine, slotMap.get(medicine.getId()), recordMap.get(medicine.getId())))
                 .toList();
+    }
+
+    private void validateDeviceSlotExists(Map<Long, DeviceSlot> slotMap, Long medicineId) {
+        if (!slotMap.containsKey(medicineId)) {
+            throw new GeneralException(ErrorStatus.DEVICE_NOT_FOUND);
+        }
     }
 }
