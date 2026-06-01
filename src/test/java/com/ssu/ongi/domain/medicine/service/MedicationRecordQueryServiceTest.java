@@ -1,5 +1,7 @@
 package com.ssu.ongi.domain.medicine.service;
 
+import com.ssu.ongi.common.exception.GeneralException;
+import com.ssu.ongi.common.status.ErrorStatus;
 import com.ssu.ongi.domain.device.entity.Device;
 import com.ssu.ongi.domain.device.entity.DeviceSlot;
 import com.ssu.ongi.domain.device.service.DeviceSlotQueryService;
@@ -23,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -85,6 +88,58 @@ class MedicationRecordQueryServiceTest {
         assertThat(result.get(1).taken()).isFalse();
         assertThat(result.get(1).result()).isNull();
         assertThat(result.get(1).recordedAt()).isNull();
+    }
+
+    @Test
+    void 당일_복약_기록이_없어도_전체_스케줄을_미복용_상태로_반환한다() {
+        LocalDate date = LocalDate.of(2026, 6, 1);
+        Elder elder = createElder(10L);
+        Medicine morningMedicine = createMedicine(1L, elder, "혈압약", LocalTime.of(8, 0));
+        Medicine afternoonMedicine = createMedicine(2L, elder, "당뇨약", LocalTime.of(13, 0));
+        Device device = Device.create(elder, "serial-number");
+        ReflectionTestUtils.setField(device, "id", 30L);
+
+        when(elderQueryService.getElderByMemberId(100L)).thenReturn(elder);
+        when(medicineRepository.findAllByElderIdOrderByScheduledTimeAsc(10L))
+                .thenReturn(List.of(morningMedicine, afternoonMedicine));
+        when(medicationRecordRepository.findAllByElderIdAndRecordedAtBetween(
+                10L, date.atStartOfDay(), date.atTime(LocalTime.MAX)))
+                .thenReturn(List.of());
+        when(deviceSlotQueryService.getSlotMapByElderId(10L))
+                .thenReturn(Map.of(
+                        1L, DeviceSlot.create(elder, device, morningMedicine, 1),
+                        2L, DeviceSlot.create(elder, device, afternoonMedicine, 2)
+                ));
+
+        List<DailyMedicationStatusResponse> result =
+                medicationRecordQueryService.getDailyMedicationStatuses(100L, date);
+
+        assertThat(result).hasSize(2);
+        assertThat(result).allSatisfy(response -> {
+            assertThat(response.taken()).isFalse();
+            assertThat(response.result()).isNull();
+            assertThat(response.recordedAt()).isNull();
+        });
+    }
+
+    @Test
+    void 스케줄에_연결된_디바이스_슬롯이_없으면_예외가_발생한다() {
+        LocalDate date = LocalDate.of(2026, 6, 1);
+        Elder elder = createElder(10L);
+        Medicine medicine = createMedicine(1L, elder, "혈압약", LocalTime.of(8, 0));
+
+        when(elderQueryService.getElderByMemberId(100L)).thenReturn(elder);
+        when(medicineRepository.findAllByElderIdOrderByScheduledTimeAsc(10L))
+                .thenReturn(List.of(medicine));
+        when(medicationRecordRepository.findAllByElderIdAndRecordedAtBetween(
+                10L, date.atStartOfDay(), date.atTime(LocalTime.MAX)))
+                .thenReturn(List.of());
+        when(deviceSlotQueryService.getSlotMapByElderId(10L)).thenReturn(Map.of());
+
+        assertThatThrownBy(() -> medicationRecordQueryService.getDailyMedicationStatuses(100L, date))
+                .isInstanceOf(GeneralException.class)
+                .extracting("errorStatus")
+                .isEqualTo(ErrorStatus.DEVICE_NOT_FOUND);
     }
 
     private Elder createElder(Long id) {

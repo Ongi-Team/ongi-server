@@ -63,7 +63,7 @@ public class MedicationRecordQueryService {
                 .collect(Collectors.toMap(
                         record -> record.getMedicine().getId(),
                         Function.identity(),
-                        (first, second) -> second
+                        (first, second) -> first.getRecordedAt().isAfter(second.getRecordedAt()) ? first : second
                 ));
         Map<Long, DeviceSlot> slotMap = deviceSlotQueryService.getSlotMapByElderId(elderId);
 
