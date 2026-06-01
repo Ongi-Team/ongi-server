@@ -1,7 +1,9 @@
 package com.ssu.ongi.domain.medicine.controller.docs;
 
+import com.ssu.ongi.common.jwt.MemberPrincipal;
 import com.ssu.ongi.common.response.ApiResponse;
 import com.ssu.ongi.domain.medicine.dto.request.MedicationRecordSyncRequest;
+import com.ssu.ongi.domain.medicine.dto.response.DailyMedicationStatusResponse;
 import com.ssu.ongi.domain.medicine.dto.response.MedicationIntakeResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -11,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -49,6 +52,18 @@ public interface MedicationRecordControllerDocs {
     })
     ResponseEntity<ApiResponse<List<MedicationIntakeResponse>>> getRecordsByDate(
             @Parameter(description = "어르신 ID", required = true) @RequestParam Long elderId,
+            @Parameter(description = "조회 날짜 (yyyy-MM-dd)", required = true) @RequestParam LocalDate date
+    );
+
+    @Operation(summary = "날짜별 복약 상태 조회", description = "로그인한 보호자의 어르신 복약 스케줄과 특정 날짜의 복약 기록을 함께 조회합니다.")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "조회 성공"
+            )
+    })
+    ResponseEntity<ApiResponse<List<DailyMedicationStatusResponse>>> getDailyMedicationStatuses(
+            @AuthenticationPrincipal MemberPrincipal principal,
             @Parameter(description = "조회 날짜 (yyyy-MM-dd)", required = true) @RequestParam LocalDate date
     );
 
