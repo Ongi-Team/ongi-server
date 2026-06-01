@@ -16,10 +16,9 @@
 5. 작성된 내용을 사용자에게 보여주고 확인을 받은 뒤 아래 명령어로 PR 생성:
 
 ```bash
-gh pr create --title "제목" --base develop --body "$(cat <<'EOF'
+cat <<'EOF' | gh pr create --title "제목" --base develop --body-file -
 본문 내용
 EOF
-)"
 ```
 
 6. 생성된 PR URL을 사용자에게 출력합니다.

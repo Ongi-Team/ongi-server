@@ -15,10 +15,9 @@
 3. 아래 명령어로 GitHub에 직접 이슈를 생성합니다:
 
 ```bash
-gh issue create --title "제목" --body "$(cat <<'EOF'
+cat <<'EOF' | gh issue create --title "제목" --body-file -
 본문 내용
 EOF
-)"
 ```
 
 4. 생성된 이슈 URL을 사용자에게 출력합니다.

@@ -34,7 +34,7 @@
 
 ```
 feat: 스케줄 기능 추가
-fix: 스케줄 기능 버스 수정
+fix: 스케줄 기능 버그 수정
 refactor: AuthCommandService 조건 분리
 chore: Flyway 마이그레이션 스크립트 추가
 ```
