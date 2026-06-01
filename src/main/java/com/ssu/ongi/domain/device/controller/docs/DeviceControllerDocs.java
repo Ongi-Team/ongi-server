@@ -5,6 +5,7 @@ import com.ssu.ongi.common.response.ApiResponse;
 import com.ssu.ongi.domain.device.dto.request.DeviceRegisterRequest;
 import com.ssu.ongi.domain.device.dto.request.HeartbeatRequest;
 import com.ssu.ongi.domain.device.dto.request.MedicationStatusRequest;
+import com.ssu.ongi.domain.device.dto.response.DeviceScheduleResponse;
 import com.ssu.ongi.domain.device.dto.response.DeviceStatusResponse;
 import com.ssu.ongi.domain.device.dto.response.RegisterDeviceResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,6 +20,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
+
+import java.util.List;
 
 @Tag(name = "Device", description = "기기 API")
 public interface DeviceControllerDocs {
@@ -84,6 +87,31 @@ public interface DeviceControllerDocs {
     })
     ResponseEntity<ApiResponse<DeviceStatusResponse>> getDeviceStatus(
             @AuthenticationPrincipal MemberPrincipal principal
+    );
+
+    @Operation(summary = "디바이스 스케줄 조회", description = "디바이스가 자신의 슬롯별 복약 시간을 조회합니다.")
+    @Parameter(name = "Device-Token", in = ParameterIn.HEADER, required = true, description = "디바이스 인증 토큰")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "디바이스 스케줄 조회 성공",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(value = """
+                                    {
+                                        "isSuccess": true,
+                                        "code": "DEVICE_200",
+                                        "message": "디바이스 스케줄 조회에 성공했습니다.",
+                                        "data": [
+                                            {
+                                                "slotNumber": 1,
+                                                "scheduledTime": "08:00:00"
+                                            }
+                                        ]
+                                    }
+                                    """))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "Device-Token 없음"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "등록되지 않은 디바이스 토큰")
+    })
+    ResponseEntity<ApiResponse<List<DeviceScheduleResponse>>> getDeviceSchedules(
+            @Parameter(hidden = true) @RequestAttribute Long deviceId
     );
 
     @Operation(summary = "디바이스 heartbeat", description = "디바이스의 연결 상태를 업데이트합니다.")

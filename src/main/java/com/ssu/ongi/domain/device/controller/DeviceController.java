@@ -7,6 +7,7 @@ import com.ssu.ongi.domain.device.controller.docs.DeviceControllerDocs;
 import com.ssu.ongi.domain.device.dto.request.DeviceRegisterRequest;
 import com.ssu.ongi.domain.device.dto.request.HeartbeatRequest;
 import com.ssu.ongi.domain.device.dto.request.MedicationStatusRequest;
+import com.ssu.ongi.domain.device.dto.response.DeviceScheduleResponse;
 import com.ssu.ongi.domain.device.dto.response.DeviceStatusResponse;
 import com.ssu.ongi.domain.device.dto.response.RegisterDeviceResponse;
 import com.ssu.ongi.domain.device.service.DeviceCommandService;
@@ -21,6 +22,8 @@ import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/device")
@@ -50,6 +53,15 @@ public class DeviceController implements DeviceControllerDocs {
     ) {
         DeviceStatusResponse response = deviceQueryService.getDeviceStatus(principal.memberId(), principal.loginMode());
         return ApiResponse.success(SuccessStatus.DEVICE_STATUS_GET_SUCCESS, response);
+    }
+
+    @Override
+    @GetMapping("/schedules")
+    public ResponseEntity<ApiResponse<List<DeviceScheduleResponse>>> getDeviceSchedules(
+            @RequestAttribute Long deviceId
+    ) {
+        List<DeviceScheduleResponse> response = deviceQueryService.getDeviceSchedules(deviceId);
+        return ApiResponse.success(SuccessStatus.DEVICE_SCHEDULE_GET_SUCCESS, response);
     }
 
     @Override

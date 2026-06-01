@@ -2,12 +2,16 @@ package com.ssu.ongi.domain.device.service;
 
 import com.ssu.ongi.common.exception.GeneralException;
 import com.ssu.ongi.common.status.ErrorStatus;
+import com.ssu.ongi.domain.device.dto.response.DeviceScheduleResponse;
 import com.ssu.ongi.domain.device.dto.response.DeviceStatusResponse;
 import com.ssu.ongi.domain.device.entity.Device;
+import com.ssu.ongi.domain.device.entity.DeviceSlot;
 import com.ssu.ongi.domain.device.enums.DeviceStatus;
 import com.ssu.ongi.domain.device.repository.DeviceRepository;
+import com.ssu.ongi.domain.device.repository.DeviceSlotRepository;
 import com.ssu.ongi.domain.elder.entity.Elder;
 import com.ssu.ongi.domain.elder.service.ElderQueryService;
+import com.ssu.ongi.domain.medicine.entity.Medicine;
 import com.ssu.ongi.domain.member.enums.LoginMode;
 import com.ssu.ongi.domain.member.service.LoginModeValidator;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +19,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -26,14 +32,17 @@ import static org.mockito.Mockito.when;
 class DeviceQueryServiceTest {
 
     private DeviceRepository deviceRepository;
+    private DeviceSlotRepository deviceSlotRepository;
     private ElderQueryService elderQueryService;
     private DeviceQueryService deviceQueryService;
 
     @BeforeEach
     void setUp() {
         deviceRepository = mock(DeviceRepository.class);
+        deviceSlotRepository = mock(DeviceSlotRepository.class);
         elderQueryService = mock(ElderQueryService.class);
-        deviceQueryService = new DeviceQueryService(deviceRepository, elderQueryService, new LoginModeValidator());
+        deviceQueryService = new DeviceQueryService(
+                deviceRepository, deviceSlotRepository, elderQueryService, new LoginModeValidator());
     }
 
     /**
@@ -109,6 +118,27 @@ class DeviceQueryServiceTest {
         verifyNoInteractions(deviceRepository);
     }
 
+    @Test
+    void 디바이스_스케줄을_슬롯_번호와_시간으로_조회한다() {
+        Elder elder = createElder(1L);
+        Device device = createDevice(10L, elder, "ONGI-001", DeviceStatus.ONLINE, -60, 3600L);
+        Medicine morningMedicine = createMedicine(100L, elder, "혈압약", LocalTime.of(8, 0));
+        Medicine afternoonMedicine = createMedicine(101L, elder, "당뇨약", LocalTime.of(13, 0));
+        DeviceSlot morningSlot = DeviceSlot.create(elder, device, morningMedicine, 1);
+        DeviceSlot afternoonSlot = DeviceSlot.create(elder, device, afternoonMedicine, 2);
+
+        when(deviceSlotRepository.findAllWithMedicineByDeviceId(10L))
+                .thenReturn(List.of(morningSlot, afternoonSlot));
+
+        List<DeviceScheduleResponse> response = deviceQueryService.getDeviceSchedules(10L);
+
+        assertThat(response).hasSize(2);
+        assertThat(response.get(0).slotNumber()).isEqualTo(1);
+        assertThat(response.get(0).scheduledTime()).isEqualTo(LocalTime.of(8, 0));
+        assertThat(response.get(1).slotNumber()).isEqualTo(2);
+        assertThat(response.get(1).scheduledTime()).isEqualTo(LocalTime.of(13, 0));
+    }
+
     /**
      * 테스트용 어르신 엔티티에 식별자를 설정합니다.
      */
@@ -130,5 +160,11 @@ class DeviceQueryServiceTest {
         ReflectionTestUtils.setField(device, "uptimeSec", uptimeSec);
         ReflectionTestUtils.setField(device, "lastSeenAt", LocalDateTime.now());
         return device;
+    }
+
+    private Medicine createMedicine(Long id, Elder elder, String name, LocalTime scheduledTime) {
+        Medicine medicine = Medicine.create(elder, name, scheduledTime);
+        ReflectionTestUtils.setField(medicine, "id", id);
+        return medicine;
     }
 }

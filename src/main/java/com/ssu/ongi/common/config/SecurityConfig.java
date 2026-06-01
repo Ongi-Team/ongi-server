@@ -53,6 +53,7 @@ public class SecurityConfig {
     // ESP32 전용 경로 — JWT 없이 Device-Token 헤더로 인증
     private static final String[] DEVICE_ONLY_URIS = {
             "/api/device/heartbeat",
+            "/api/device/schedules",
             "/api/device/medication-status"
     };
 
