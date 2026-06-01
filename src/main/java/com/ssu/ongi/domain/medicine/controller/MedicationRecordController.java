@@ -1,9 +1,11 @@
 package com.ssu.ongi.domain.medicine.controller;
 
+import com.ssu.ongi.common.jwt.MemberPrincipal;
 import com.ssu.ongi.common.response.ApiResponse;
 import com.ssu.ongi.common.status.SuccessStatus;
 import com.ssu.ongi.domain.medicine.controller.docs.MedicationRecordControllerDocs;
 import com.ssu.ongi.domain.medicine.dto.request.MedicationRecordSyncRequest;
+import com.ssu.ongi.domain.medicine.dto.response.DailyMedicationStatusResponse;
 import com.ssu.ongi.domain.medicine.dto.response.MedicationIntakeResponse;
 import com.ssu.ongi.domain.medicine.service.MedicationRecordCommandService;
 import com.ssu.ongi.domain.medicine.service.MedicationRecordQueryService;
@@ -11,6 +13,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -46,6 +49,17 @@ public class MedicationRecordController implements MedicationRecordControllerDoc
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
     ) {
         List<MedicationIntakeResponse> response = medicationRecordQueryService.getRecordsByDate(elderId, date);
+        return ApiResponse.success(SuccessStatus.GET_MEDICATION_RECORD_SUCCESS, response);
+    }
+
+    @Override
+    @GetMapping("/daily")
+    public ResponseEntity<ApiResponse<List<DailyMedicationStatusResponse>>> getDailyMedicationStatuses(
+            @AuthenticationPrincipal MemberPrincipal principal,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
+    ) {
+        List<DailyMedicationStatusResponse> response =
+                medicationRecordQueryService.getDailyMedicationStatuses(principal.memberId(), date);
         return ApiResponse.success(SuccessStatus.GET_MEDICATION_RECORD_SUCCESS, response);
     }
 
