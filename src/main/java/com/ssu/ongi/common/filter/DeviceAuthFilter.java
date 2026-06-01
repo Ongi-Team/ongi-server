@@ -1,6 +1,7 @@
 package com.ssu.ongi.common.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ssu.ongi.common.config.SecurityConfig;
 import com.ssu.ongi.common.device.DeviceTokenValidator;
 import com.ssu.ongi.common.response.ApiResponse;
 import com.ssu.ongi.common.status.ErrorStatus;
@@ -26,12 +27,8 @@ public class DeviceAuthFilter extends OncePerRequestFilter {
 
     private static final String DEVICE_TOKEN_HEADER = "Device-Token";
 
-    // ESP32 전용 경로 — Device-Token 헤더로 인증. SecurityConfig에서도 참조합니다.
-    public static final List<String> DEVICE_ONLY_PATHS = List.of(
-            "/api/device/heartbeat",
-            "/api/device/schedules",
-            "/api/device/medication-status"
-    );
+    // ESP32 전용 경로 — SecurityConfig.DEVICE_ONLY_URIS를 단일 진실 공급원으로 참조합니다.
+    private static final List<String> DEVICE_ONLY_PATHS = List.of(SecurityConfig.DEVICE_ONLY_URIS);
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
